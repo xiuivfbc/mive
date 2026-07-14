@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+
+# Environment
+.env
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/test-results/
+
+# Database
+pgdata/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/settings.local.json
+.claude/skills/
+
+# Runtime logs
+logs/*
+!logs/.gitkeep
+
+# Local dev scripts (personal shortcuts, not shared)
+d
+q
+
+# Temporary debug scripts
+debug_*.py
+!src/debug_logger.py
+
+# Dev tooling artifacts
+.playwright-cli/
+.playwright/
+frontend/e2e/.auth/
+frontend/playwright-report/
+.pytest_cache/
+.ruff_cache/
+
+# Trae
+.trae/
+
+# Origin certificate (Cloudflare)
+origin_certificate/
+
+# screenshoot
+screenshoot/
+
+# Project docs (kept locally, not tracked)
+CLAUDE.md

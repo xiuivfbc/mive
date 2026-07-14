@@ -1,0 +1,120 @@
+/* ========================================
+   Naive UI — per-theme CSS overrides
+   For styles that can't be achieved via
+   NConfigProvider themeOverrides.
+   ======================================== */
+
+/* --- INK theme --- */
+[data-theme="ink"] .n-button--primary-type {
+  box-shadow: 0 2px 8px rgba(20, 212, 168, 0.2);
+}
+[data-theme="ink"] .n-button--primary-type:hover {
+  box-shadow: 0 4px 16px rgba(20, 212, 168, 0.3);
+}
+[data-theme="ink"] .n-card {
+  background: #ffffff;
+  border: 1px solid rgba(20, 212, 168, 0.1);
+  box-shadow: 0 2px 12px rgba(20, 212, 168, 0.06);
+}
+[data-theme="ink"] .n-modal-mask {
+  background: rgba(28, 46, 43, 0.4);
+}
+
+/* INK 暗色模式 */
+[data-theme="ink"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(20, 212, 168, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="ink"][data-mode="dark"] .n-modal-mask {
+  background: rgba(10, 30, 25, 0.6);
+}
+
+/* --- BREEZE theme --- */
+[data-theme="breeze"] .n-button--primary-type {
+  box-shadow: 0 2px 8px rgba(152, 115, 247, 0.2);
+}
+[data-theme="breeze"] .n-button--primary-type:hover {
+  box-shadow: 0 4px 16px rgba(152, 115, 247, 0.25);
+}
+[data-theme="breeze"] .n-card {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+[data-theme="breeze"] .n-tag {
+  border-radius: 50px;
+}
+
+/* BREEZE 暗色模式 */
+[data-theme="breeze"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(152, 115, 247, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="breeze"][data-mode="dark"] .n-modal-mask {
+  background: rgba(26, 24, 48, 0.6);
+}
+
+/* ---- Button borders — theme-aware via CSS vars ---- */
+
+/* SAKURA 暗色模式 */
+[data-theme="sakura"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(233, 30, 99, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="sakura"][data-mode="dark"] .n-modal-mask {
+  background: rgba(50, 12, 30, 0.6);
+}
+
+/* EMBER 暗色模式 */
+[data-theme="ember"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(245, 124, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="ember"][data-mode="dark"] .n-modal-mask {
+  background: rgba(50, 26, 8, 0.6);
+}
+
+/* SUNFLOWER 暗色模式 */
+[data-theme="sunflower"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 179, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="sunflower"][data-mode="dark"] .n-modal-mask {
+  background: rgba(40, 34, 8, 0.6);
+}
+
+/* OCEAN 暗色模式 */
+[data-theme="ocean"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(41, 121, 255, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="ocean"][data-mode="dark"] .n-modal-mask {
+  background: rgba(8, 20, 40, 0.6);
+}
+
+/* INDIGO 暗色模式 */
+[data-theme="indigo"][data-mode="dark"] .n-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(67, 56, 202, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="indigo"][data-mode="dark"] .n-modal-mask {
+  background: rgba(14, 12, 40, 0.6);
+}
+
+.n-button--default-type {
+  border: 1px solid var(--border) !important;
+}
+.n-button--default-type:hover {
+  border-color: var(--accent) !important;
+}
+.n-button--primary-type {
+  border: 1px solid var(--accent) !important;
+}
+.n-button--primary-type:hover {
+  border-color: var(--accent-hover) !important;
+}

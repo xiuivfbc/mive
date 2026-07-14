@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 安装编译依赖（cryptography/bcrypt 需要 gcc + rust）
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装依赖
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -i https://mirrors.ustc.edu.cn/pypi/simple \
+    --trusted-host mirrors.ustc.edu.cn .
+
+# 复制源码
+COPY src/ src/
+COPY alembic/ alembic/
+COPY alembic.ini .
+
+EXPOSE 8000
+
+# 启动：先跑迁移，再启服务
+CMD ["sh", "-c", "python -m alembic upgrade head && python -m uvicorn src.main:app --host 0.0.0.0 --port 8000"]

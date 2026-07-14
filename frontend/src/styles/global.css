@@ -1,0 +1,713 @@
+/* ========================================
+   MIVE Global Styles
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Hide scrollbar globally — keep scroll functionality */
+* {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
+}
+*::-webkit-scrollbar {
+  display: none;               /* Chrome/Safari */
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--bg-deep);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
+}
+
+#app {
+  min-height: 100vh; /* Fallback for older browsers */
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  position: relative;
+}
+
+/* ========================================
+   Background Decoration Layer
+   ======================================== */
+
+/* --- Shared base for all pseudo-element decorations --- */
+#app::before,
+#app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ========================
+   #app::before — glow halos + mouse light
+   ======================== */
+
+/* INK: ink-wash warm glow halos + noise + mouse glow */
+[data-theme="ink"] #app::before {
+  background:
+    /* mouse-following glow */
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(20, 212, 168, 0.12)), transparent 40%),
+    /* primary warm teal halo (top-left) */
+    radial-gradient(ellipse at 20% 30%, rgba(20, 212, 168, 0.18) 0%, transparent 50%),
+    /* secondary sky blue halo (bottom-right) */
+    radial-gradient(ellipse at 75% 70%, rgba(100, 120, 180, 0.15) 0%, transparent 50%),
+    /* tertiary amber/gold halo (center) */
+    radial-gradient(ellipse at 50% 50%, rgba(201, 168, 76, 0.12) 0%, transparent 55%),
+    /* SVG noise texture */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* BREEZE: soft purple/blue glow halos + noise + mouse glow */
+[data-theme="breeze"] #app::before {
+  background:
+    /* mouse-following glow */
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(152, 115, 247, 0.12)), transparent 40%),
+    /* primary purple halo (top-left) */
+    radial-gradient(ellipse at 20% 30%, rgba(152, 115, 247, 0.18) 0%, transparent 50%),
+    /* secondary blue halo (bottom-right) */
+    radial-gradient(ellipse at 75% 70%, rgba(124, 92, 252, 0.15) 0%, transparent 50%),
+    /* tertiary soft pink-lavender halo (center) */
+    radial-gradient(ellipse at 50% 50%, rgba(169, 136, 249, 0.12) 0%, transparent 55%),
+    /* SVG noise texture (finer than ink) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* INDIGO: deep blue-indigo glow halos + noise + mouse glow */
+[data-theme="indigo"] #app::before {
+  background:
+    /* mouse-following glow */
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(67, 56, 202, 0.12)), transparent 40%),
+    /* primary deep indigo halo (top-left) */
+    radial-gradient(ellipse at 20% 30%, rgba(67, 56, 202, 0.18) 0%, transparent 50%),
+    /* secondary lighter indigo halo (bottom-right) */
+    radial-gradient(ellipse at 75% 70%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    /* tertiary soft blue halo (center) */
+    radial-gradient(ellipse at 50% 50%, rgba(79, 70, 229, 0.12) 0%, transparent 55%),
+    /* SVG noise texture */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* SAKURA: soft pink glow halos + noise + mouse glow */
+[data-theme="sakura"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(233, 30, 99, 0.12)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(233, 30, 99, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(244, 143, 177, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(240, 98, 146, 0.12) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* EMBER: warm orange glow halos + noise + mouse glow */
+[data-theme="ember"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(245, 124, 0, 0.12)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(245, 124, 0, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(245, 166, 35, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(220, 140, 40, 0.12) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* SUNFLOWER: warm golden glow halos + noise + mouse glow */
+[data-theme="sunflower"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(255, 179, 0, 0.12)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(255, 179, 0, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(255, 202, 51, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(230, 161, 0, 0.12) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+/* OCEAN: cool blue glow halos + noise + mouse glow */
+[data-theme="ocean"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(41, 121, 255, 0.12)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(41, 121, 255, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(91, 158, 240, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(60, 130, 220, 0.12) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.02'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+
+
+/* ========================
+   #app::after — noise texture / grid overlay
+   ======================== */
+
+/* INK: noise overlay */
+[data-theme="ink"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* BREEZE: noise overlay */
+[data-theme="breeze"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* INDIGO: noise overlay */
+[data-theme="indigo"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* SAKURA: noise overlay */
+[data-theme="sakura"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* EMBER: noise overlay */
+[data-theme="ember"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* SUNFLOWER: noise overlay */
+[data-theme="sunflower"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* OCEAN: noise overlay */
+[data-theme="ocean"] #app::after {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 0.5);
+}
+
+/* ========================
+   .bg-decor + .bg-blob — large DOM blobs (AuthPage pattern)
+   ======================== */
+
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  will-change: transform;
+}
+
+/* --- blob A: top-left --- */
+.bg-blob--a {
+  width: 700px;
+  height: 700px;
+  top: -200px;
+  left: -200px;
+  animation: float-orb-a 35s ease-in-out infinite;
+}
+
+/* --- blob B: bottom-right --- */
+.bg-blob--b {
+  width: 600px;
+  height: 600px;
+  bottom: -150px;
+  right: -150px;
+  animation: float-orb-b 40s ease-in-out infinite;
+}
+
+/* --- blob C: top-center accent --- */
+.bg-blob--c {
+  width: 500px;
+  height: 500px;
+  top: -100px;
+  right: 20%;
+  animation: float-orb-a 30s ease-in-out infinite reverse;
+}
+
+/* INK blobs */
+[data-theme="ink"] .bg-blob--a {
+  background: radial-gradient(circle, #14d4a8 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="ink"] .bg-blob--b {
+  background: radial-gradient(circle, #5b9ef0 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="ink"] .bg-blob--c {
+  background: radial-gradient(circle, rgba(201, 168, 76, 1) 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* BREEZE blobs */
+[data-theme="breeze"] .bg-blob--a {
+  background: radial-gradient(circle, #9873f7 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="breeze"] .bg-blob--b {
+  background: radial-gradient(circle, #a988f9 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="breeze"] .bg-blob--c {
+  background: radial-gradient(circle, #7eb8da 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* INDIGO blobs */
+[data-theme="indigo"] .bg-blob--a {
+  background: radial-gradient(circle, #4338ca 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="indigo"] .bg-blob--b {
+  background: radial-gradient(circle, #6366f1 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="indigo"] .bg-blob--c {
+  background: radial-gradient(circle, #4f46e5 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* SAKURA blobs */
+[data-theme="sakura"] .bg-blob--a {
+  background: radial-gradient(circle, #f06292 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="sakura"] .bg-blob--b {
+  background: radial-gradient(circle, #f48fb1 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="sakura"] .bg-blob--c {
+  background: radial-gradient(circle, #ec407a 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* EMBER blobs */
+[data-theme="ember"] .bg-blob--a {
+  background: radial-gradient(circle, #f57c00 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="ember"] .bg-blob--b {
+  background: radial-gradient(circle, #f5a623 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="ember"] .bg-blob--c {
+  background: radial-gradient(circle, #dc8c28 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* SUNFLOWER blobs */
+[data-theme="sunflower"] .bg-blob--a {
+  background: radial-gradient(circle, #ffb300 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="sunflower"] .bg-blob--b {
+  background: radial-gradient(circle, #ffc933 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="sunflower"] .bg-blob--c {
+  background: radial-gradient(circle, #e6a100 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* OCEAN blobs */
+[data-theme="ocean"] .bg-blob--a {
+  background: radial-gradient(circle, #2979ff 0%, transparent 65%);
+  opacity: 0.22;
+}
+[data-theme="ocean"] .bg-blob--b {
+  background: radial-gradient(circle, #5b9ef0 0%, transparent 65%);
+  opacity: 0.18;
+}
+[data-theme="ocean"] .bg-blob--c {
+  background: radial-gradient(circle, #3c82dc 0%, transparent 60%);
+  opacity: 0.14;
+}
+
+/* ========================
+   Floating orb keyframes
+   ======================== */
+
+@keyframes float-orb-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes float-orb-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-25px, 20px) scale(1.04); }
+  50% { transform: translate(15px, -25px) scale(0.96); }
+  75% { transform: translate(20px, 10px) scale(1.02); }
+}
+
+/* ========================
+   Reduced motion: disable all animations
+   ======================== */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme] .bg-decor,
+  [data-theme] .bg-decor::before {
+    animation: none !important;
+  }
+}
+
+/* --- Selection --- */
+[data-theme="ink"] ::selection {
+  background: rgba(201, 168, 76, 0.25);
+  color: var(--text-primary);
+}
+[data-theme="breeze"] ::selection {
+  background: rgba(79, 110, 247, 0.15);
+  color: var(--text-primary);
+}
+[data-theme="indigo"] ::selection {
+  background: rgba(67, 56, 202, 0.15);
+  color: var(--text-primary);
+}
+[data-theme="sakura"] ::selection {
+  background: rgba(233, 30, 99, 0.15);
+  color: var(--text-primary);
+}
+[data-theme="ember"] ::selection {
+  background: rgba(245, 124, 0, 0.15);
+  color: var(--text-primary);
+}
+[data-theme="sunflower"] ::selection {
+  background: rgba(255, 179, 0, 0.15);
+  color: var(--text-primary);
+}
+[data-theme="ocean"] ::selection {
+  background: rgba(41, 121, 255, 0.15);
+  color: var(--text-primary);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-theme="ink"] ::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.2);
+  border-radius: 3px;
+}
+
+/* INK 暗色模式装饰层 */
+[data-theme="ink"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(20, 212, 168, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(20, 212, 168, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(100, 120, 180, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(201, 168, 76, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="ink"][data-mode="dark"] .bg-blob--a {
+  opacity: 0.3;
+}
+[data-theme="ink"][data-mode="dark"] .bg-blob--b {
+  opacity: 0.25;
+}
+[data-theme="ink"][data-mode="dark"] .bg-blob--c {
+  opacity: 0.2;
+}
+[data-theme="ink"][data-mode="dark"] ::selection {
+  background: rgba(20, 212, 168, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="ink"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(20, 212, 168, 0.25);
+  border-radius: 3px;
+}
+[data-theme="breeze"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* BREEZE 暗色模式装饰层 */
+[data-theme="breeze"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(152, 115, 247, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(152, 115, 247, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(124, 92, 252, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(169, 136, 249, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="breeze"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="breeze"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="breeze"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="breeze"][data-mode="dark"] ::selection {
+  background: rgba(152, 115, 247, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="breeze"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(152, 115, 247, 0.25);
+  border-radius: 3px;
+}
+[data-theme="indigo"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* INDIGO 暗色模式装饰层 */
+[data-theme="indigo"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(67, 56, 202, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(67, 56, 202, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="indigo"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="indigo"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="indigo"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="indigo"][data-mode="dark"] ::selection {
+  background: rgba(67, 56, 202, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="indigo"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(67, 56, 202, 0.25);
+  border-radius: 3px;
+}
+[data-theme="sakura"] ::-webkit-scrollbar-thumb {
+  background: rgba(233, 30, 99, 0.15);
+  border-radius: 3px;
+}
+
+/* SAKURA 暗色模式装饰层 */
+[data-theme="sakura"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(233, 30, 99, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(233, 30, 99, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(244, 143, 177, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(240, 98, 146, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="sakura"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="sakura"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="sakura"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="sakura"][data-mode="dark"] ::selection {
+  background: rgba(233, 30, 99, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="sakura"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(233, 30, 99, 0.25);
+  border-radius: 3px;
+}
+[data-theme="ember"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* EMBER 暗色模式装饰层 */
+[data-theme="ember"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(245, 124, 0, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(245, 124, 0, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(245, 166, 35, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(220, 140, 40, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="ember"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="ember"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="ember"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="ember"][data-mode="dark"] ::selection {
+  background: rgba(245, 124, 0, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="ember"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(245, 124, 0, 0.25);
+  border-radius: 3px;
+}
+[data-theme="sunflower"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* SUNFLOWER 暗色模式装饰层 */
+[data-theme="sunflower"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(255, 179, 0, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(255, 179, 0, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(255, 202, 51, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(230, 161, 0, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="sunflower"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="sunflower"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="sunflower"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="sunflower"][data-mode="dark"] ::selection {
+  background: rgba(255, 179, 0, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="sunflower"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 179, 0, 0.25);
+  border-radius: 3px;
+}
+[data-theme="ocean"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* OCEAN 暗色模式装饰层 */
+[data-theme="ocean"][data-mode="dark"] #app::before {
+  background:
+    radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), var(--deco-glow-1, rgba(41, 121, 255, 0.2)), transparent 40%),
+    radial-gradient(ellipse at 20% 30%, rgba(41, 121, 255, 0.22) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 70%, rgba(91, 158, 240, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(60, 130, 220, 0.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  opacity: var(--deco-noise-opacity, 1);
+}
+[data-theme="ocean"][data-mode="dark"] .bg-blob--a { opacity: 0.3; }
+[data-theme="ocean"][data-mode="dark"] .bg-blob--b { opacity: 0.25; }
+[data-theme="ocean"][data-mode="dark"] .bg-blob--c { opacity: 0.2; }
+[data-theme="ocean"][data-mode="dark"] ::selection {
+  background: rgba(41, 121, 255, 0.3);
+  color: var(--text-primary);
+}
+[data-theme="ocean"][data-mode="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(41, 121, 255, 0.25);
+  border-radius: 3px;
+}
+
+/* --- Naive UI base overrides --- */
+.n-card {
+  --n-color: var(--bg-card) !important;
+  --n-action-color: var(--bg-card) !important;
+  --n-title-text-color: var(--text-primary) !important;
+  --n-text-color: var(--text-secondary) !important;
+  --n-close-icon-color: var(--text-muted) !important;
+  --n-close-icon-color-hover: var(--text-primary) !important;
+  --n-border-color: var(--border-subtle) !important;
+  border-radius: var(--radius) !important;
+}
+
+.n-modal {
+  --n-color: var(--bg-elevated) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.n-button--primary-type {
+  --n-color: var(--accent) !important;
+  --n-color-hover: var(--accent-hover) !important;
+  --n-color-pressed: var(--accent) !important;
+  font-weight: 600;
+}
+
+.n-tag--info {
+  --n-color: var(--tag-bg) !important;
+  --n-text-color: var(--tag-text) !important;
+  --n-border: none !important;
+}
+
+.n-empty__description {
+  --n-description-color: var(--color-text-muted) !important;
+}
+
+.n-result--error {
+  --n-title-color: var(--color-error) !important;
+  --n-content-color: var(--color-text-secondary) !important;
+}
+
+.n-input {
+  --n-color: var(--bg-input) !important;
+  --n-color-focus: var(--bg-input) !important;
+  --n-border: 1px solid var(--border-subtle) !important;
+  --n-border-focus: 1px solid var(--accent) !important;
+  --n-text-color: var(--text-primary) !important;
+  --n-placeholder-color: var(--text-faint) !important;
+  --n-caret-color: var(--accent) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.n-select {
+  --n-color: var(--bg-input) !important;
+  --n-menu-color: var(--bg-elevated) !important;
+}
+
+.n-tabs {
+  --n-tab-text-color: var(--text-muted) !important;
+  --n-tab-text-color-active: var(--accent) !important;
+  --n-tab-text-color-hover: var(--accent) !important;
+  --n-bar-color: var(--accent) !important;
+}
+
+.n-collapse {
+  --n-divider-color: var(--border-subtle) !important;
+  --n-arrow-color: var(--text-muted) !important;
+}
+
+.n-popconfirm {
+  --n-color: var(--bg-elevated) !important;
+}
+
+.n-timeline {
+  --n-line-color: var(--border-subtle) !important;
+}
+
+/* --- Theme-specific Naive UI tweaks --- */
+
+/* INK: gold primary buttons text dark */
+[data-theme="ink"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* BREEZE: accent button text */
+[data-theme="breeze"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* INDIGO: accent button text */
+[data-theme="indigo"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* SAKURA: accent button text */
+[data-theme="sakura"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* EMBER: accent button text */
+[data-theme="ember"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* SUNFLOWER: accent button text */
+[data-theme="sunflower"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}
+
+/* OCEAN: accent button text */
+[data-theme="ocean"] .n-button--primary-type {
+  --n-text-color: #fff !important;
+}

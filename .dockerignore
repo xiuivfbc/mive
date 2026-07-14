@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+.env
+.pytest_cache
+.ruff_cache
+.mypy_cache
+tests/
+frontend/node_modules/
+frontend/dist/
+.claude/
+*.md
+!README.md

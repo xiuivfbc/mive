@@ -1,0 +1,42 @@
+{
+  "name": "mive-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test:e2e": "npx playwright test",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "@vicons/ionicons5": "^0.12",
+    "axios": "^1.7",
+    "cytoscape": "^3.30",
+    "d3": "^7.9.0",
+    "dompurify": "^3.4.8",
+    "marked": "^18.0.4",
+    "md-editor-rt": "^6.5.1",
+    "naive-ui": "^2.40",
+    "pinia": "^3.0.4",
+    "vue": "^3.5",
+    "vue-click-to-component": "^0.3.8",
+    "vue-i18n": "^9.14.5",
+    "vue-router": "^4.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/cytoscape": "^3.21",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^25.9.1",
+    "@vitejs/plugin-vue": "^5.2",
+    "@vue/test-utils": "^2.4.10",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7",
+    "vite": "^6.2",
+    "vitest": "^4.1.7",
+    "vue-tsc": "^2.2"
+  }
+}

@@ -1,0 +1,199 @@
+# =============================================================================
+# Matterbridge Configuration Template for MIVE
+# =============================================================================
+# Docs: https://github.com/42wim/matterbridge/wiki/How-to-create-your-config
+#
+# Copy this file to matterbridge.toml and fill in your credentials.
+# Each section bridges a chat platform to a "gateway" that MIVE connects to.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# General settings
+# -----------------------------------------------------------------------------
+[general]
+# Enable the REST API that MIVE connects to
+RemoteNickFormat = "{NICK}"
+# Preserve original message formatting
+StripMarkdown = false
+# Show join/leave messages
+ShowJoinPart = false
+# Message length limit (0 = no limit)
+MessageLength = 0
+# Media download path (used for file/image bridging)
+MediaDownloadPath = "/tmp/mb-downloads"
+# Media server URL (optional, for serving downloaded files)
+# MediaServerURL = "https://your-media-server.example.com"
+
+# -----------------------------------------------------------------------------
+# Gateway definitions
+# Each gateway defines a logical "room" that bridges multiple protocols together.
+# MIVE connects to these gateways via the REST API.
+# -----------------------------------------------------------------------------
+[gateway]
+    [gateway.mive]
+    enable = true
+    name = "mive"
+    # Inbound: messages from these channels flow INTO MIVE
+    # Outbound: MIVE messages flow OUT to these channels
+
+# -----------------------------------------------------------------------------
+# REST API (MIVE connects here)
+# -----------------------------------------------------------------------------
+[api]
+    [api.mive]
+    # Enable the API bridge
+    enable = true
+    # Token for API authentication (generate with: openssl rand -hex 32)
+    # IMPORTANT: Set MATTERBRIDGE_API_TOKEN in .env to the same value
+    Token = "${MATTERBRIDGE_API_TOKEN}"
+    # Bind address for the REST API
+    BindAddress = "0.0.0.0:4242"
+    # Allow requests from these CIDRs (empty = allow all)
+    # AllowedCIDRs = ["172.0.0.0/8"]
+
+# -----------------------------------------------------------------------------
+# Discord bridge (optional)
+# Uncomment and configure to bridge Discord channels to MIVE
+# -----------------------------------------------------------------------------
+# [discord]
+#     [discord.mive]
+#     enable = true
+#     Token = "${DISCORD_BOT_TOKEN}"
+#     Server = "YOUR_SERVER_ID"
+#     # Use "debug" for troubleshooting
+#     RemoteNickFormat = "{NICK}"
+#     # Show edit messages
+#     EditDelay = "1s"
+#     # Use webhook for better integration
+#     UseWebhooks = true
+#     WebhookURL = ""
+#     # Message general settings
+#     # General = true
+
+# -----------------------------------------------------------------------------
+# Telegram bridge (optional)
+# Uncomment and configure to bridge Telegram groups to MIVE
+# -----------------------------------------------------------------------------
+# [telegram]
+#     [telegram.mive]
+#     enable = true
+#     Token = "${TELEGRAM_BOT_TOKEN}"
+#     # Message format
+#     RemoteNickFormat = "{NICK}"
+#     # Use this if you want to specify a particular chat
+#     # RemoteNickFormat = "[{PROTOCOL}] <{NICK}> "
+#     # Show join/part messages
+#     ShowJoinPart = false
+#     # Use this to enable markdown parsing
+#     # UseFirstName = true
+
+# -----------------------------------------------------------------------------
+# Slack bridge (optional)
+# Uncomment and configure to bridge Slack channels to MIVE
+# -----------------------------------------------------------------------------
+# [slack]
+#     [slack.mive]
+#     enable = true
+#     Token = "${SLACK_TOKEN}"
+#     # Use this for Slack App (Bot) tokens
+#     # Token = "xoxb-..."
+#     # Use this for Slack legacy tokens
+#     # Token = "xoxp-..."
+#     # Slack team domain
+#     Team = "your-team"
+#     # Show join/leave messages
+#     ShowJoinPart = false
+#     # Use this to prefix messages with the protocol name
+#     # PrefixMessagesWithNick = true
+
+# -----------------------------------------------------------------------------
+# Matrix bridge (optional)
+# Uncomment and configure to bridge Matrix rooms to MIVE
+# -----------------------------------------------------------------------------
+# [matrix]
+#     [matrix.mive]
+#     enable = true
+#     Server = "https://matrix.org"
+#     Login = "your-bot-username"
+#     Password = "${MATRIX_PASSWORD}"
+#     # or use access token instead of password
+#     # AccessToken = "${MATRIX_ACCESS_TOKEN}"
+#     # Show join/leave messages
+#     ShowJoinPart = false
+
+# -----------------------------------------------------------------------------
+# IRC bridge (optional)
+# Uncomment and configure to bridge IRC channels to MIVE
+# -----------------------------------------------------------------------------
+# [irc]
+#     [irc.mive]
+#     enable = true
+#     Server = "irc.libera.chat:6697"
+#     Nick = "mive-bot"
+#     # Use TLS
+#     UseTLS = true
+#     # Skip TLS verification (not recommended for production)
+#     # SkipTLSVerify = true
+#     # Channels to join
+#     Channel = "#mive"
+#     # NickServ password (if needed)
+#     # NickServNick = "NickServ"
+#     # NickServPassword = "${IRC_NICKSERV_PASSWORD}"
+#     # Show join/leave messages
+#     ShowJoinPart = false
+
+# -----------------------------------------------------------------------------
+# XMPP/Jabber bridge (optional)
+# Uncomment and configure to bridge XMPP MUCs to MIVE
+# -----------------------------------------------------------------------------
+# [xmpp]
+#     [xmpp.mive]
+#     enable = true
+#     Server = "your-xmpp-server.com"
+#     Muc = "conference.your-xmpp-server.com"
+#     JID = "bot@your-xmpp-server.com"
+#     Password = "${XMPP_PASSWORD}"
+#     Nick = "mive-bot"
+#     # Show join/leave messages
+#     ShowJoinPart = false
+
+# -----------------------------------------------------------------------------
+# Gateway routing (map bridges to gateways)
+# -----------------------------------------------------------------------------
+# Each [[gateway.mive]] section maps a bridge to the "mive" gateway.
+# The "account" field matches the bridge config section name.
+# The "channel" field is the channel/room/group to bridge.
+
+# Discord routing
+# [[gateway.mive]]
+# account = "discord.mive"
+# channel = "GENERAL_CHANNEL_ID"
+
+# Telegram routing
+# [[gateway.mive]]
+# account = "telegram.mive"
+# channel = "-1001234567890"
+
+# Slack routing
+# [[gateway.mive]]
+# account = "slack.mive"
+# channel = "#general"
+
+# Matrix routing
+# [[gateway.mive]]
+# account = "matrix.mive"
+# channel = "!roomid:matrix.org"
+
+# IRC routing
+# [[gateway.mive]]
+# account = "irc.mive"
+# channel = "#mive"
+
+# XMPP routing
+# [[gateway.mive]]
+# account = "xmpp.mive"
+# channel = "room@conference.your-xmpp-server.com"
+
+# API routing (required for MIVE integration)
+[[gateway.mive]]
+account = "api.mive"

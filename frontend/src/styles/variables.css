@@ -1,0 +1,790 @@
+/* ========================================
+   MIVE Theme System — CSS Variables
+   Themes: ink (青绿), breeze (淡紫), indigo (靛青)
+   ======================================== */
+
+/* --- Shared variables (all themes) --- */
+:root {
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  --font-sm: 12px;
+  --font-md: 14px;
+  --font-lg: 16px;
+  --font-xl: 20px;
+  --font-2xl: 28px;
+  --font-3xl: 36px;
+  --font-4xl: 48px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 0.2s;
+  --duration-normal: 0.35s;
+}
+
+/* ========================
+   Theme: INK (清新)
+   Mint teal + sky blue
+   ======================== */
+[data-theme="ink"] {
+  /* Core palette — 亮色（方案 B：中度暗化） */
+  --bg-deep: #b0d8cf;
+  --bg-main: #cceae3;
+  --bg-card: #f4fbf9;
+  --bg-card-hover: #e8f6f2;
+  --bg-elevated: #f4fbf9;
+  --bg-input: #c4e2d9;
+
+  --accent: #14d4a8;
+  --accent-hover: #2ae8c8;
+  --accent-dim: rgba(20, 212, 168, 0.15);
+  --accent-glow: rgba(20, 212, 168, 0.1);
+
+  --text-primary: #1a2e28;
+  --text-secondary: #3a6058;
+  --text-muted: #6a9a8e;
+  --text-faint: #9ac0b4;
+
+  --border: rgba(20, 212, 168, 0.25);
+  --border-subtle: rgba(20, 212, 168, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(10, 90, 75, 0.12), 0 0 0 1px rgba(20, 212, 168, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(10, 90, 75, 0.18), 0 0 0 1px rgba(20, 212, 168, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(20, 212, 168, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #14d4a8, #7db4ff);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #e8f6f2;
+  --bubble-user-bg: rgba(20, 212, 168, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(20, 212, 168, 1);
+  --deco-orb-2: rgba(91, 158, 240, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(100, 120, 140, 1);
+  --deco-glow-1: rgba(20, 212, 168, 1);
+  --deco-glow-2: rgba(201, 168, 76, 1);
+}
+
+/* ========================
+   Theme: INK — 暗色模式（方案 C：深度暗化）
+   Deep green bg + lighter cards
+   ======================== */
+[data-theme="ink"][data-mode="dark"] {
+  --bg-deep: #27302e;
+  --bg-main: #2d3936;
+  --bg-card: #394744;
+  --bg-card-hover: #445551;
+  --bg-elevated: #394744;
+  --bg-input: #323e3b;
+
+  --accent: #14d4a8;
+  --accent-hover: #2ae8c8;
+  --accent-dim: rgba(20, 212, 168, 0.2);
+  --accent-glow: rgba(20, 212, 168, 0.15);
+
+  --text-primary: #d4ece6;
+  --text-secondary: #a0ccbc;
+  --text-muted: #7ab8a8;
+  --text-faint: #5a9a8a;
+
+  --border: rgba(20, 212, 168, 0.3);
+  --border-subtle: rgba(20, 212, 168, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(20, 212, 168, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(20, 212, 168, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(20, 212, 168, 0.15);
+
+  --shadow-bubble: 0 1px 4px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #445551;
+  --bubble-user-bg: rgba(20, 212, 168, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(20, 212, 168, 1);
+  --deco-glow-2: rgba(201, 168, 76, 1);
+}
+
+/* ========================
+   Theme: BREEZE (明亮)
+   Clean white + purple
+   ======================== */
+[data-theme="breeze"] {
+  --bg-deep: #c8bfe8;
+  --bg-main: #ddd7f3;
+  --bg-card: #f9f7fe;
+  --bg-card-hover: #efe9fb;
+  --bg-elevated: #f9f7fe;
+  --bg-input: #c0b7e0;
+
+  --accent: #9873f7;
+  --accent-hover: #a988f9;
+  --accent-dim: rgba(152, 115, 247, 0.15);
+  --accent-glow: rgba(152, 115, 247, 0.1);
+
+  --text-primary: #201e30;
+  --text-secondary: #504870;
+  --text-muted: #8078a0;
+  --text-faint: #b0a8cc;
+
+  --border: rgba(152, 115, 247, 0.25);
+  --border-subtle: rgba(152, 115, 247, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(67, 44, 140, 0.12), 0 0 0 1px rgba(152, 115, 247, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(67, 44, 140, 0.18), 0 0 0 1px rgba(152, 115, 247, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(152, 115, 247, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #9873f7, #7c5cfc);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #efe9fb;
+  --bubble-user-bg: rgba(152, 115, 247, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(152, 115, 247, 1);
+  --deco-orb-2: rgba(169, 136, 249, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(139, 143, 163, 1);
+  --deco-glow-1: rgba(152, 115, 247, 1);
+  --deco-glow-2: rgba(126, 184, 218, 1);
+}
+
+/* ========================
+   Theme: BREEZE — 暗色模式（方案 C：深度暗化）
+   Deep purple bg + lighter cards
+   ======================== */
+[data-theme="breeze"][data-mode="dark"] {
+  --bg-deep: #292730;
+  --bg-main: #312d39;
+  --bg-card: #3d3947;
+  --bg-card-hover: #494455;
+  --bg-elevated: #3d3947;
+  --bg-input: #35323e;
+
+  --accent: #9873f7;
+  --accent-hover: #a988f9;
+  --accent-dim: rgba(152, 115, 247, 0.2);
+  --accent-glow: rgba(152, 115, 247, 0.15);
+
+  --text-primary: #ddd7f3;
+  --text-secondary: #a89cd0;
+  --text-muted: #7068a0;
+  --text-faint: #504870;
+
+  --border: rgba(152, 115, 247, 0.3);
+  --border-subtle: rgba(152, 115, 247, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(152, 115, 247, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(152, 115, 247, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(152, 115, 247, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #494455;
+  --bubble-user-bg: rgba(152, 115, 247, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(152, 115, 247, 1);
+  --deco-glow-2: rgba(169, 136, 249, 1);
+}
+
+/* ========================
+   Theme: SAKURA (樱粉)
+   Soft pink + rose — feminine, warm, delicate
+   ======================== */
+[data-theme="sakura"] {
+  --bg-deep: #f0d0d8;
+  --bg-main: #f8e0e8;
+  --bg-card: #fdf3f6;
+  --bg-card-hover: #fbe6ec;
+  --bg-elevated: #fdf3f6;
+  --bg-input: #e8c0cc;
+
+  --accent: #e91e63;
+  --accent-hover: #f06292;
+  --accent-dim: rgba(233, 30, 99, 0.15);
+  --accent-glow: rgba(233, 30, 99, 0.1);
+
+  --text-primary: #3a1820;
+  --text-secondary: #704050;
+  --text-muted: #a07888;
+  --text-faint: #c8a8b4;
+
+  --border: rgba(233, 30, 99, 0.25);
+  --border-subtle: rgba(233, 30, 99, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(140, 18, 59, 0.12), 0 0 0 1px rgba(233, 30, 99, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(140, 18, 59, 0.18), 0 0 0 1px rgba(233, 30, 99, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(233, 30, 99, 0.15);
+
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-lg: 24px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #f06292, #f48fb1);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #fbe6ec;
+  --bubble-user-bg: rgba(233, 30, 99, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(233, 30, 99, 1);
+  --deco-orb-2: rgba(244, 143, 177, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(200, 140, 160, 1);
+  --deco-glow-1: rgba(233, 30, 99, 1);
+  --deco-glow-2: rgba(244, 143, 177, 1);
+
+  --graph-node-hue-start: 330;
+  --graph-node-hue-end: 350;
+  --graph-node-saturation: 70%;
+  --graph-node-lightness: 60%;
+  --graph-text: #3a1820;
+  --graph-line: rgba(233, 30, 99, 0.15);
+}
+
+/* ========================
+   Theme: SAKURA — 暗色模式（方案 C：深度暗化）
+   Deep pink bg + lighter cards
+   ======================== */
+[data-theme="sakura"][data-mode="dark"] {
+  --bg-deep: #30272a;
+  --bg-main: #392d31;
+  --bg-card: #47393e;
+  --bg-card-hover: #55444a;
+  --bg-elevated: #47393e;
+  --bg-input: #3e3236;
+
+  --accent: #e91e63;
+  --accent-hover: #f06292;
+  --accent-dim: rgba(233, 30, 99, 0.2);
+  --accent-glow: rgba(233, 30, 99, 0.15);
+
+  --text-primary: #f8e0e8;
+  --text-secondary: #c88898;
+  --text-muted: #905868;
+  --text-faint: #603848;
+
+  --border: rgba(233, 30, 99, 0.3);
+  --border-subtle: rgba(233, 30, 99, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(233, 30, 99, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(233, 30, 99, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(233, 30, 99, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #55444a;
+  --bubble-user-bg: rgba(233, 30, 99, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(233, 30, 99, 1);
+  --deco-glow-2: rgba(244, 143, 177, 1);
+
+  --graph-text: #f8e0e8;
+}
+
+/* ========================
+   Theme: EMBER (焰橙)
+   Warm burnt orange + light
+   ======================== */
+[data-theme="ember"] {
+  --bg-deep: #f0d8c0;
+  --bg-main: #f8e8d4;
+  --bg-card: #fdf6ee;
+  --bg-card-hover: #fbebd9;
+  --bg-elevated: #fdf6ee;
+  --bg-input: #e8ccb0;
+
+  --accent: #f57c00;
+  --accent-hover: #ff9e33;
+  --accent-dim: rgba(245, 124, 0, 0.15);
+  --accent-glow: rgba(245, 124, 0, 0.1);
+
+  --text-primary: #2e1a08;
+  --text-secondary: #705030;
+  --text-muted: #a08060;
+  --text-faint: #c0a888;
+
+  --border: rgba(245, 124, 0, 0.25);
+  --border-subtle: rgba(245, 124, 0, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(135, 68, 0, 0.12), 0 0 0 1px rgba(245, 124, 0, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(135, 68, 0, 0.18), 0 0 0 1px rgba(245, 124, 0, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(245, 124, 0, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #f57c00, #fbb940);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #fbebd9;
+  --bubble-user-bg: rgba(245, 124, 0, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(245, 124, 0, 1);
+  --deco-orb-2: rgba(245, 166, 35, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(180, 140, 100, 1);
+  --deco-glow-1: rgba(245, 124, 0, 1);
+  --deco-glow-2: rgba(245, 166, 35, 1);
+
+  --graph-node-hue-start: 25;
+  --graph-node-hue-end: 45;
+  --graph-node-saturation: 80%;
+  --graph-node-lightness: 55%;
+  --graph-text: #2e1a08;
+  --graph-line: rgba(245, 124, 0, 0.15);
+}
+
+/* ========================
+   Theme: EMBER — 暗色模式（方案 C：深度暗化）
+   Deep orange bg + lighter cards
+   ======================== */
+[data-theme="ember"][data-mode="dark"] {
+  --bg-deep: #302b27;
+  --bg-main: #39332d;
+  --bg-card: #474039;
+  --bg-card-hover: #554d44;
+  --bg-elevated: #474039;
+  --bg-input: #3e3832;
+
+  --accent: #f57c00;
+  --accent-hover: #ff9e33;
+  --accent-dim: rgba(245, 124, 0, 0.2);
+  --accent-glow: rgba(245, 124, 0, 0.15);
+
+  --text-primary: #f8e8d4;
+  --text-secondary: #c09868;
+  --text-muted: #906840;
+  --text-faint: #604828;
+
+  --border: rgba(245, 124, 0, 0.3);
+  --border-subtle: rgba(245, 124, 0, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(245, 124, 0, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(245, 124, 0, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(245, 124, 0, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #554d44;
+  --bubble-user-bg: rgba(245, 124, 0, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(245, 124, 0, 1);
+  --deco-glow-2: rgba(245, 166, 35, 1);
+
+  --graph-text: #f8e8d4;
+}
+
+/* ========================
+   Theme: SUNFLOWER (葵黄)
+   Warm golden yellow + light
+   ======================== */
+[data-theme="sunflower"] {
+  --bg-deep: #f2e7c4;
+  --bg-main: #f9f1d8;
+  --bg-card: #fefaf0;
+  --bg-card-hover: #fcf2d9;
+  --bg-elevated: #fefaf0;
+  --bg-input: #ecdfb3;
+
+  --accent: #ffb300;
+  --accent-hover: #ffc933;
+  --accent-dim: rgba(255, 179, 0, 0.15);
+  --accent-glow: rgba(255, 179, 0, 0.1);
+
+  --text-primary: #2b2205;
+  --text-secondary: #7a5f12;
+  --text-muted: #a3873f;
+  --text-faint: #cdb679;
+
+  --border: rgba(255, 179, 0, 0.25);
+  --border-subtle: rgba(255, 179, 0, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(153, 102, 0, 0.12), 0 0 0 1px rgba(255, 179, 0, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(153, 102, 0, 0.18), 0 0 0 1px rgba(255, 179, 0, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 179, 0, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #ffb300, #ffd54f);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #fcf2d9;
+  --bubble-user-bg: rgba(255, 179, 0, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(255, 179, 0, 1);
+  --deco-orb-2: rgba(255, 202, 51, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(184, 152, 90, 1);
+  --deco-glow-1: rgba(255, 179, 0, 1);
+  --deco-glow-2: rgba(255, 202, 51, 1);
+
+  --graph-node-hue-start: 40;
+  --graph-node-hue-end: 52;
+  --graph-node-saturation: 90%;
+  --graph-node-lightness: 55%;
+  --graph-text: #2b2205;
+  --graph-line: rgba(255, 179, 0, 0.15);
+}
+
+/* ========================
+   Theme: SUNFLOWER — 暗色模式（方案 C：深度暗化）
+   Deep gold bg + lighter cards
+   ======================== */
+[data-theme="sunflower"][data-mode="dark"] {
+  --bg-deep: #302c22;
+  --bg-main: #383425;
+  --bg-card: #46402f;
+  --bg-card-hover: #554d38;
+  --bg-elevated: #46402f;
+  --bg-input: #3e3826;
+
+  --accent: #ffb300;
+  --accent-hover: #ffc933;
+  --accent-dim: rgba(255, 179, 0, 0.2);
+  --accent-glow: rgba(255, 179, 0, 0.15);
+
+  --text-primary: #f9f1d8;
+  --text-secondary: #d4b568;
+  --text-muted: #a68a4a;
+  --text-faint: #6f5c30;
+
+  --border: rgba(255, 179, 0, 0.3);
+  --border-subtle: rgba(255, 179, 0, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 179, 0, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 179, 0, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 179, 0, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #554d38;
+  --bubble-user-bg: rgba(255, 179, 0, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(255, 179, 0, 1);
+  --deco-glow-2: rgba(255, 202, 51, 1);
+
+  --graph-text: #f9f1d8;
+}
+
+/* ========================
+   Theme: OCEAN (海蓝)
+   Cool ocean blue + light
+   ======================== */
+[data-theme="ocean"] {
+  --bg-deep: #b8d0f0;
+  --bg-main: #d0e0f8;
+  --bg-card: #f0f5fd;
+  --bg-card-hover: #dde8fb;
+  --bg-elevated: #f0f5fd;
+  --bg-input: #b0c8e8;
+
+  --accent: #2979ff;
+  --accent-hover: #5b9cff;
+  --accent-dim: rgba(41, 121, 255, 0.15);
+  --accent-glow: rgba(41, 121, 255, 0.1);
+
+  --text-primary: #0a1828;
+  --text-secondary: #385068;
+  --text-muted: #6880a0;
+  --text-faint: #98b0c8;
+
+  --border: rgba(41, 121, 255, 0.25);
+  --border-subtle: rgba(41, 121, 255, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(23, 67, 140, 0.12), 0 0 0 1px rgba(41, 121, 255, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(23, 67, 140, 0.18), 0 0 0 1px rgba(41, 121, 255, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(41, 121, 255, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #2979ff, #7db4ff);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #dde8fb;
+  --bubble-user-bg: rgba(41, 121, 255, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(41, 121, 255, 1);
+  --deco-orb-2: rgba(91, 158, 240, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(100, 140, 180, 1);
+  --deco-glow-1: rgba(41, 121, 255, 1);
+  --deco-glow-2: rgba(91, 158, 240, 1);
+
+  --graph-node-hue-start: 210;
+  --graph-node-hue-end: 230;
+  --graph-node-saturation: 70%;
+  --graph-node-lightness: 55%;
+  --graph-text: #0a1828;
+  --graph-line: rgba(41, 121, 255, 0.15);
+}
+
+/* ========================
+   Theme: OCEAN — 暗色模式（方案 C：深度暗化）
+   Deep blue bg + lighter cards
+   ======================== */
+[data-theme="ocean"][data-mode="dark"] {
+  --bg-deep: #272a30;
+  --bg-main: #2d3239;
+  --bg-card: #393e47;
+  --bg-card-hover: #444a55;
+  --bg-elevated: #393e47;
+  --bg-input: #32373e;
+
+  --accent: #2979ff;
+  --accent-hover: #5b9cff;
+  --accent-dim: rgba(41, 121, 255, 0.2);
+  --accent-glow: rgba(41, 121, 255, 0.15);
+
+  --text-primary: #d0e0f8;
+  --text-secondary: #88a8d0;
+  --text-muted: #5878a0;
+  --text-faint: #385068;
+
+  --border: rgba(41, 121, 255, 0.3);
+  --border-subtle: rgba(41, 121, 255, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(41, 121, 255, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(41, 121, 255, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(41, 121, 255, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #444a55;
+  --bubble-user-bg: rgba(41, 121, 255, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(41, 121, 255, 1);
+  --deco-glow-2: rgba(91, 158, 240, 1);
+
+  --graph-text: #d0e0f8;
+}
+
+/* ========================
+   Theme: INDIGO (靛青)
+   Deep blue-indigo + light background
+   ======================== */
+[data-theme="indigo"] {
+  /* Core palette — 亮色（方案 B：中度暗化） */
+  --bg-deep: #c0bce0;
+  --bg-main: #d5d2e8;
+  --bg-card: #f3f2fa;
+  --bg-card-hover: #e2dff6;
+  --bg-elevated: #f3f2fa;
+  --bg-input: #b8b4d8;
+
+  --accent: #4338ca;
+  --accent-hover: #4f46e5;
+  --accent-dim: rgba(67, 56, 202, 0.15);
+  --accent-glow: rgba(67, 56, 202, 0.1);
+
+  --text-primary: #101030;
+  --text-secondary: #404068;
+  --text-muted: #7070a0;
+  --text-faint: #a0a0c8;
+
+  --border: rgba(67, 56, 202, 0.25);
+  --border-subtle: rgba(67, 56, 202, 0.12);
+
+  --shadow-card: 0 2px 10px rgba(40, 32, 110, 0.12), 0 0 0 1px rgba(67, 56, 202, 0.12);
+  --shadow-card-hover: 0 10px 28px rgba(40, 32, 110, 0.18), 0 0 0 1px rgba(67, 56, 202, 0.22);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(67, 56, 202, 0.15);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --font-display: 'Noto Serif SC', serif;
+  --font-body: 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+
+  --gradient-accent: linear-gradient(135deg, #4338ca, #6366f1);
+
+  --color-error: #e04040;
+  --color-success: #22a855;
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bubble-character-bg: #e2dff6;
+  --bubble-user-bg: rgba(67, 56, 202, 0.12);
+
+  /* Decoration layer */
+  --deco-orb-1: rgba(67, 56, 202, 1);
+  --deco-orb-2: rgba(99, 102, 241, 1);
+  --deco-orb-opacity: 0.08;
+  --deco-noise-opacity: 0.18;
+  --deco-grid-opacity: 0;
+  --deco-grid-color: rgba(120, 120, 180, 1);
+  --deco-glow-1: rgba(67, 56, 202, 1);
+  --deco-glow-2: rgba(99, 102, 241, 1);
+
+  --graph-node-hue-start: 235;
+  --graph-node-hue-end: 260;
+  --graph-node-saturation: 65%;
+  --graph-node-lightness: 55%;
+  --graph-text: #101030;
+  --graph-line: rgba(67, 56, 202, 0.15);
+}
+
+/* ========================
+   Theme: INDIGO — 暗色模式（方案 C：深度暗化）
+   Deep indigo bg + lighter cards
+   ======================== */
+[data-theme="indigo"][data-mode="dark"] {
+  --bg-deep: #272730;
+  --bg-main: #2e2d39;
+  --bg-card: #3a3947;
+  --bg-card-hover: #454455;
+  --bg-elevated: #3a3947;
+  --bg-input: #33323e;
+
+  --accent: #4338ca;
+  --accent-hover: #4f46e5;
+  --accent-dim: rgba(67, 56, 202, 0.2);
+  --accent-glow: rgba(67, 56, 202, 0.15);
+
+  --text-primary: #d5d2e8;
+  --text-secondary: #9890c0;
+  --text-muted: #6058a0;
+  --text-faint: #403870;
+
+  --border: rgba(67, 56, 202, 0.3);
+  --border-subtle: rgba(67, 56, 202, 0.15);
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(67, 56, 202, 0.1);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(67, 56, 202, 0.2);
+  --shadow-dialog: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(67, 56, 202, 0.15);
+
+  --shadow-bubble: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --bubble-character-bg: #454455;
+  --bubble-user-bg: rgba(67, 56, 202, 0.15);
+
+  /* Decoration layer — 暗色下装饰更明显 */
+  --deco-orb-opacity: 0.12;
+  --deco-noise-opacity: 0.22;
+  --deco-glow-1: rgba(67, 56, 202, 1);
+  --deco-glow-2: rgba(99, 102, 241, 1);
+
+  --graph-text: #d5d2e8;
+}
+
+/* ========================
+   Backward-compat aliases
+   Maps old var names to new ones so existing component
+   code keeps working with minimal changes.
+   ======================== */
+[data-theme="ink"],
+[data-theme="breeze"],
+[data-theme="sakura"],
+[data-theme="ember"],
+[data-theme="sunflower"],
+[data-theme="ocean"],
+[data-theme="indigo"] {
+  --color-bg: var(--bg-main);
+  --color-bg-secondary: var(--bg-card);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-input: var(--bg-input);
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-muted: var(--accent-dim);
+
+  --color-border: var(--border-subtle);
+  --color-border-hover: var(--border);
+
+  --card-bg: var(--bg-card);
+  --card-border: var(--border-subtle);
+  --card-border-hover: var(--border);
+  --glow-color: var(--accent-glow);
+
+  --tag-bg: var(--accent-dim);
+  --tag-text: var(--accent);
+
+  --shadow-card-hover: var(--shadow-card-hover);
+}
+
+[data-theme="breeze"] {
+  --color-bg-overlay: rgba(255, 255, 255, 0.7);
+}
