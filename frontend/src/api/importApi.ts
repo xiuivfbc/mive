@@ -58,7 +58,9 @@ export interface ImportRelationPreview {
   type: string | null
   description: string | null
   direction: string
-  status: 'valid' | 'skipped'
+  status: 'valid' | 'update' | 'skipped'
+  old_type?: string | null
+  old_description?: string | null
 }
 
 export interface GraphPreviewResponse {
@@ -67,6 +69,7 @@ export interface GraphPreviewResponse {
   new_characters: number
   existing_characters: number
   valid_relations: number
+  updated_relations: number
   skipped_relations: number
 }
 
@@ -108,7 +111,7 @@ export async function confirmGraphImport(
   worldId: string,
   characters: ImportCharacterReq[],
   relations: ImportRelationReq[],
-): Promise<{ characters: number; relations: number }> {
+): Promise<{ characters: number; relations: number; updated_relations: number }> {
   const { data } = await client.post(`/worlds/${worldId}/import/graph`, {
     characters,
     relations,

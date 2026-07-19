@@ -296,7 +296,7 @@ async def stream_messages(
                 try:
                     data = await asyncio.wait_for(q.get(), timeout=30)
                     yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Heartbeat
                     yield "event: ping\ndata: {}\n\n"
         finally:
@@ -329,7 +329,11 @@ async def get_status(
 
     binding = await svc.get_binding(world_id)
     stream_running = svc.is_stream_running(world_id)
-    health = await svc.health_check(world_id) if binding else {"status": "error", "detail": "No binding"}
+    health = (
+        {"status": "error", "detail": "No binding"}
+        if not binding
+        else await svc.health_check(world_id)
+    )
 
     connected_clients = len(_stream_queues.get(world_id, set()))
 

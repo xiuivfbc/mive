@@ -1,7 +1,7 @@
 import { ref, toValue, type Ref, type MaybeRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useMessage, useDialog } from 'naive-ui'
-import { listVersions, rollbackVersion, updateVersionName, deleteVersion } from '@/api/versions'
+import { listVersions, rollbackVersion, updateVersionName, deleteVersion, createVersion, updateVersionSnapshot } from '@/api/versions'
 import { parseApiError } from '@/utils/apiError'
 import type { WorldVersion } from '@/types/version'
 
@@ -12,6 +12,8 @@ export function useVersionHistory(worldId: MaybeRef<string>) {
 
   const versions = ref<WorldVersion[]>([])
   const loading = ref(false)
+  const creating = ref(false)
+  const updating = ref(false)
 
   async function loadVersions() {
     loading.value = true
@@ -54,6 +56,32 @@ export function useVersionHistory(worldId: MaybeRef<string>) {
     }
   }
 
+  async function onCreateVersion() {
+    creating.value = true
+    try {
+      const newVersion = await createVersion(toValue(worldId))
+      versions.value = [newVersion, ...versions.value]
+      message.success(t('version.createSuccess'))
+    } catch (e) {
+      message.error(t('version.createFailed', { msg: parseApiError(e, t) }))
+    } finally {
+      creating.value = false
+    }
+  }
+
+  async function onUpdateSnapshot(versionId: string) {
+    updating.value = true
+    try {
+      const updated = await updateVersionSnapshot(toValue(worldId), versionId)
+      versions.value = versions.value.map((ver) => (ver.id === versionId ? updated : ver))
+      message.success(t('version.updateSnapshotSuccess'))
+    } catch (e) {
+      message.error(t('version.updateSnapshotFailed', { msg: parseApiError(e, t) }))
+    } finally {
+      updating.value = false
+    }
+  }
+
   function onDelete(versionId: string) {
     dialog.warning({
       title: t('version.deleteTitle'),
@@ -75,9 +103,13 @@ export function useVersionHistory(worldId: MaybeRef<string>) {
   return {
     versions,
     loading,
+    creating,
+    updating,
     loadVersions,
     onRollback,
     renameVersion,
     onDelete,
+    onCreateVersion,
+    onUpdateSnapshot,
   }
 }

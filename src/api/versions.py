@@ -93,3 +93,30 @@ async def delete_version(
         if "current version" in str(e).lower():
             raise HTTPException(status_code=409, detail=str(e)) from e
         raise HTTPException(status_code=404, detail=str(e)) from e
+
+
+@router.post("", status_code=201, response_model=WorldVersion)
+async def create_version(
+    world_id: str,
+    service: VersionService = Depends(get_version_service),
+):
+    """创建新版本。自动更新当前版本快照后创建新版本。"""
+    try:
+        return await service.create_version(world_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@router.post("/{version_id}/update-snapshot", response_model=WorldVersion)
+async def update_version_snapshot(
+    world_id: str,
+    version_id: str,
+    service: VersionService = Depends(get_version_service),
+):
+    """将版本快照数据更新为当前世界状态。"""
+    try:
+        return await service.update_snapshot(version_id, world_id)
+    except ValueError as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        raise HTTPException(status_code=400, detail=str(e)) from e

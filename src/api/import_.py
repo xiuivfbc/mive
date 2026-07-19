@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import uuid as _uuid
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
@@ -18,13 +19,32 @@ from src.api.deps import (
 )
 from src.db.session import async_session
 from src.models.character import Character, CreateCharacterRequest, UpdateCharacterRequest
-from src.models.relation import CreateRelationRequest
+from src.models.relation import CreateRelationRequest, Relation, UpdateRelationRequest
 from src.services.character_service import CharacterService
 from src.services.relation_service import RelationService
 from src.services.snapshot_sync_service import bump_generation_sql, publish_snapshot_dirty
 from src.services.world_service import WorldService
 
 logger = logging.getLogger(__name__)
+
+
+# ── JSON extraction helper ─────────────────────────────────────────────────
+
+_JSON_BLOCK_RE = re.compile(
+    r"(?:```(?:json)?\s*)?"  # optional markdown fence
+    r"(\{.*\})",  # capture JSON object
+    re.DOTALL,
+)
+
+
+def extract_json_block(text: str) -> str:
+    """Extract JSON from text that may be wrapped in markdown code blocks."""
+    text = text.strip()
+    m = _JSON_BLOCK_RE.search(text)
+    if m:
+        return m.group(1)
+    return text
+
 
 router = APIRouter(prefix="/api/worlds", tags=["import"])
 
@@ -174,10 +194,10 @@ async def preview_graph_import(
     for c in existing:
         name_to_id[c.name.lower()] = str(c.id)
 
-    # Load existing active relations for duplicate detection
+    # Load existing active relations for duplicate/update detection
     existing_relations = await relation_service.list_by_world(world_id)
-    existing_rel_set: set[tuple[str, str, str]] = {
-        (r.character_a, r.character_b, r.direction)
+    existing_rel_map: dict[tuple[str, str, str], Relation] = {
+        (r.character_a, r.character_b, r.direction): r
         for r in existing_relations
         if r.status == "active"
     }
@@ -223,9 +243,10 @@ async def preview_graph_import(
             )
             name_to_placeholder[lower_name] = placeholder_id
 
-    # Preview relations (resolve IDs + detect existing)
+    # Preview relations (resolve IDs + detect existing vs update)
     relation_previews: list[dict] = []
     valid_rel = 0
+    update_rel = 0
     skipped_rel = 0
     for rel_req in req.relations:
         a_id = _resolve_character_ref(
@@ -244,11 +265,14 @@ async def preview_graph_import(
             "direction": rel_req.direction,
         }
         if a_id and b_id:
-            # Check if this relation already exists
             rel_key = (a_id, b_id, rel_req.direction or "bidirectional")
-            if rel_key in existing_rel_set:
-                entry["status"] = "skipped"
-                skipped_rel += 1
+            if rel_key in existing_rel_map:
+                _rel = existing_rel_map[rel_key]
+                entry["status"] = "update"
+                entry["old_type"] = _rel.type
+                entry["old_description"] = _rel.description
+                entry["existing_id"] = str(_rel.id)
+                update_rel += 1
             else:
                 entry["status"] = "valid"
                 valid_rel += 1
@@ -263,6 +287,7 @@ async def preview_graph_import(
         "new_characters": new_count,
         "existing_characters": existing_count,
         "valid_relations": valid_rel,
+        "updated_relations": update_rel,
         "skipped_relations": skipped_rel,
     }
 
@@ -327,11 +352,12 @@ async def confirm_graph_import(
                 )
             created_chars[lower_name] = str(resp.id)
 
-    # 2. Create relations (skip existing to avoid unique constraint violation)
+    # 2. Create or update relations (update existing, create new)
     created_rels: int = 0
+    updated_rels: int = 0
     existing_relations = await relation_service.list_by_world(world_id)
-    existing_rel_set: set[tuple[str, str, str]] = {
-        (r.character_a, r.character_b, r.direction)
+    existing_rel_map: dict[tuple[str, str, str], Relation] = {
+        (r.character_a, r.character_b, r.direction): r
         for r in existing_relations
         if r.status == "active"
     }
@@ -340,10 +366,21 @@ async def confirm_graph_import(
         b_id = _resolve_character_ref(rel_req.character_b, existing_map, name_to_id, created_chars)
         if not (a_id and b_id):
             continue
-        # Skip if an active relation with the same pair + direction already exists
         rel_key = (a_id, b_id, rel_req.direction or "bidirectional")
-        if rel_key in existing_rel_set:
+        if rel_key in existing_rel_map:
+            # Update existing relation (overwrite type + description)
+            _rel = existing_rel_map[rel_key]
+            if rel_req.type is not None or rel_req.description is not None:
+                await relation_service.update(
+                    str(_rel.id),
+                    UpdateRelationRequest(
+                        type=rel_req.type,
+                        description=rel_req.description,
+                    ),
+                )
+                updated_rels += 1
             continue
+        # Create new relation
         cr = CreateRelationRequest(
             character_a=a_id,
             character_b=b_id,
@@ -358,7 +395,20 @@ async def confirm_graph_import(
     await bump_generation_sql(world_id, session)
     bg_tasks.add_task(publish_snapshot_dirty, request.app.state.redis, world_id, "character")
 
-    return {"characters": len(created_chars), "relations": created_rels}
+    # 4. Update summary counts for world list page
+    from src.db.repositories.world_repo import WorldRepository
+
+    world_repo = WorldRepository(session)
+    all_chars = await character_service.list_by_world(world_id)
+    all_rels = await relation_service.list_by_world(world_id)
+    active_rels = [r for r in all_rels if r.status == "active"]
+    await world_repo.update_counts(world_id, char_count=len(all_chars), rel_count=len(active_rels))
+
+    return {
+        "characters": len(created_chars),
+        "relations": created_rels,
+        "updated_relations": updated_rels,
+    }
 
 
 # ── Elements import ────────────────────────────────────────────────────────

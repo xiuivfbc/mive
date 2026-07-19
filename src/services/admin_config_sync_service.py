@@ -20,6 +20,7 @@ from src.services.admin_config_service import (
     apply_persisted_overrides,
     rebuild_embedding,
     rebuild_main_llm,
+    rebuild_rerank,
     rebuild_sub_llm,
 )
 
@@ -116,6 +117,8 @@ class AdminConfigSyncService:
                 await rebuild_sub_llm(self._app)
             elif group == "embedding":
                 rebuild_embedding(self._app)
+            elif group == "rerank":
+                rebuild_rerank(self._app)
             else:
                 logger.warning("AdminConfigSyncService: unknown group=%s, skipping rebuild", group)
                 return

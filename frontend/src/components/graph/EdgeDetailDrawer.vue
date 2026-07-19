@@ -151,12 +151,18 @@ async function onDelete(item: Relation) {
     >
       <div class="edge-drawer__chars">
         <div class="edge-drawer__char">
-          <div class="edge-drawer__avatar">{{ (pairChars.a?.name ?? '?').charAt(0) }}</div>
+          <div class="edge-drawer__avatar">
+            <img v-if="pairChars.a?.portrait_url" :src="pairChars.a.portrait_url" class="edge-drawer__avatar-img" />
+            <span v-else>{{ (pairChars.a?.name ?? '?').charAt(0) }}</span>
+          </div>
           <span>{{ pairChars.a?.name ?? $t('graph.unknownName') }}</span>
         </div>
         <span class="edge-drawer__arrow">↔</span>
         <div class="edge-drawer__char">
-          <div class="edge-drawer__avatar">{{ (pairChars.b?.name ?? '?').charAt(0) }}</div>
+          <div class="edge-drawer__avatar">
+            <img v-if="pairChars.b?.portrait_url" :src="pairChars.b.portrait_url" class="edge-drawer__avatar-img" />
+            <span v-else>{{ (pairChars.b?.name ?? '?').charAt(0) }}</span>
+          </div>
           <span>{{ pairChars.b?.name ?? $t('graph.unknownName') }}</span>
         </div>
       </div>
@@ -270,6 +276,14 @@ async function onDelete(item: Relation) {
   font-weight: 700;
   font-size: 16px;
   font-family: var(--font-display);
+  overflow: hidden;
+}
+
+.edge-drawer__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .edge-drawer__arrow {

@@ -74,7 +74,7 @@ async def send_message(
             element_injection_ids=req.element_injection_ids,
             constraint=req.constraint,
         )
-    except (HTTPException,):
+    except HTTPException:
         raise
     except TimeoutError:
         logger.warning("send_message timed out for world %s", world_id)

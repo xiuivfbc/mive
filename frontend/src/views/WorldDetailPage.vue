@@ -93,7 +93,8 @@ const sideTab = ref<'manual' | 'command'>('manual')
 const mobilePanelOpen = ref(false)
 const loading = ref(true)
 const error = ref<string | null>(null)
-const currentTab = ref('graph')
+const STORAGE_KEY = `world_tab_${props.id}`
+const currentTab = ref(sessionStorage.getItem(STORAGE_KEY) ?? 'world')
 const editingTitle = ref(false)
 const tempTitle = ref('')
 const titleInputRef = ref<HTMLInputElement | null>(null)
@@ -437,6 +438,7 @@ function onImportClick() {
 }
 
 async function onTabChange(name: string) {
+  sessionStorage.setItem(STORAGE_KEY, name)
   currentTab.value = name
   if (name === 'graph' && !graphLoaded.value) {
     try {
@@ -628,7 +630,7 @@ onMounted(async () => {
                         'world-wiki-content--has-btn': plotOverflowing,
                       }"
                     >
-                      {{ plotSummary }}
+                      <MarkdownText :text="plotSummary" />
                     </div>
                     <button
                       v-if="plotOverflowing"

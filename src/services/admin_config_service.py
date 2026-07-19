@@ -60,6 +60,11 @@ _GROUP_SETTINGS_MAP: dict[str, dict[str, str]] = {
         "model": "embedding_model",
         "dim": "embedding_dim",
     },
+    "rerank": {
+        "api_key": "rerank_api_key",
+        "base_url": "rerank_base_url",
+        "model": "rerank_model",
+    },
 }
 
 
@@ -234,6 +239,15 @@ def rebuild_embedding(app) -> None:
     logger.info("[admin-config] Embedding provider rebuilt: model=%s", settings.embedding_model)
 
 
+def rebuild_rerank(app) -> None:
+    """Rebuild rerank provider."""
+    from src.llm.rerank_provider import create_rerank_provider
+
+    rerank = create_rerank_provider(settings)
+    app.state.rerank_provider = rerank
+    logger.info("[admin-config] Rerank provider rebuilt: model=%s", settings.rerank_model)
+
+
 class AdminConfigService:
     def __init__(self, session: AsyncSession, request: Request | None = None):
         self.session = session
@@ -403,3 +417,5 @@ class AdminConfigService:
             await rebuild_sub_llm(app)
         elif group_name == "embedding":
             rebuild_embedding(app)
+        elif group_name == "rerank":
+            rebuild_rerank(app)

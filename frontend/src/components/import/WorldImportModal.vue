@@ -8,7 +8,7 @@ import {
 import type { WorldFieldsPreviewResponse, ImportCharacterReq, ImportRelationReq } from '@/api/importApi'
 import { previewWorldFields, confirmWorldFields } from '@/api/importApi'
 import { parseApiError } from '@/utils/apiError'
-import { extractPromptSection } from '@/utils/importPrompt'
+import { extractPromptSection, extractFirstJsonBlock } from '@/utils/importPrompt'
 import worldFieldsMd from '@docs/import-prompts/world-fields.md?raw'
 
 const props = defineProps<{
@@ -39,6 +39,36 @@ function copyPrompt() {
 const jsonInput = ref('')
 const loading = ref(false)
 const parsingError = ref<string | null>(null)
+
+function copyErrorPrompt() {
+  let base = promptTemplate.value
+  if (props.worldName) {
+    base = base
+      .replace(/\{输入你想要的作品名称\}/g, props.worldName)
+      .replace(/\{input the name of the work\}/g, props.worldName)
+  }
+  const text = [
+    base,
+    '',
+    '---',
+    '',
+    '## 错误信息',
+    '',
+    `> **${parsingError.value}**`,
+    '',
+    '## 需要修复的输入',
+    '',
+    '```json',
+    jsonInput.value,
+    '```',
+    '',
+    '---',
+    '',
+    '请参考上面的格式要求，帮我修复上述 JSON 数据中的错误。',
+  ].join('\n')
+  navigator.clipboard.writeText(text)
+  messageApi.success(t('common.copied'))
+}
 
 // Preview state
 let previewData: WorldFieldsPreviewResponse | null = null
@@ -75,16 +105,7 @@ async function handleParse() {
   loading.value = true
   parsingError.value = null
   try {
-    let rawData = jsonInput.value.trim()
-    // Try to extract JSON block from markdown code fences
-    const jsonMatch = rawData.match(/```(?:json)?\s*([\s\S]*?)```/)
-    if (jsonMatch) rawData = jsonMatch[1].trim()
-    else {
-      // Try matching just the outermost braces
-      const braceMatch = rawData.match(/^\{[\s\S]*\}$/)
-      if (braceMatch) rawData = braceMatch[0]
-    }
-
+    const rawData = extractFirstJsonBlock(jsonInput.value)
     const parsed = JSON.parse(rawData)
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
       parsingError.value = t('import.parseInvalid')
@@ -135,7 +156,7 @@ async function handleConfirm() {
     for (const [key, entry] of Object.entries(previewData.world_fields ?? {})) {
       const strategy = fieldStrategies.value[key] ?? 'overwrite'
       if (strategy === 'skip') continue
-      data[key] = entry.new
+      data[key] = entry.merged
       strategies[key] = strategy
     }
     await confirmWorldFields(props.worldId, data, strategies)
@@ -186,9 +207,14 @@ function getStrategyLabel(s: string): string {
           :disabled="loading"
         />
       </NFormItem>
-      <NAlert v-if="parsingError" type="error" style="margin-top: 8px;">
-        {{ parsingError }}
-      </NAlert>
+      <div v-if="parsingError" style="margin-top: 8px;">
+        <NAlert type="error" style="margin-bottom: 8px;">{{ parsingError }}</NAlert>
+        <div style="display: flex; justify-content: flex-end;">
+          <NButton size="small" secondary @click="copyErrorPrompt">
+            {{ $t('import.copyErrorPrompt') }}
+          </NButton>
+        </div>
+      </div>
     </div>
 
     <!-- Step 2: Preview & Confirm -->

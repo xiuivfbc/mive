@@ -81,9 +81,9 @@ const form = ref<CreateWorldRequest>({
 })
 
 const EXPECTED_MIN: Record<string, number> = {
-  standard: 15,
-  detailed: 50,
-  deep: 100,
+  standard: 5,
+  detailed: 10,
+  deep: 30,
   all: 0,
 }
 
@@ -247,9 +247,18 @@ function selectCandidate(url: string) {
   }
 }
 
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 async function handleWikiSelectConfirm() {
   const manual = manualWikiUrl.value.trim()
-  if (manual && !manual.includes('wikipedia.org/wiki/')) {
+  if (manual && !isValidHttpUrl(manual)) {
     manualWikiUrlError.value = true
     return
   }
@@ -565,6 +574,8 @@ function registerAutoDestroy() {
     v-model:visible="previewVisible"
     :url="previewUrl"
     :page-title="previewPageTitle"
+    :title="form.title"
+    :author="form.author"
   />
 </template>
 

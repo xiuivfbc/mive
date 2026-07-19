@@ -86,16 +86,17 @@ async def check_wiki(
     """预检维基百科是否有该作品词条。低档位先试 LLM 门控，通过则走快速路径。"""
     user_language.set(current_user.preferred_language)
 
-    # 低档位先试 LLM 门控
+    # low-tier scales try LLM gate first
     scale = req.scale or DEFAULT_SCALE
-    if scale == "standard":
-        _char_target = _SCALES.get(scale, _SCALES.get("standard")).char_target
+    if scale in ("standard", "detailed"):
+        _scale_cfg = _SCALES.get(scale, _SCALES["standard"])
         gate = await world_service.judge_fast_path(
             title=req.title,
             author=req.author,
             description=None,
             scale=scale,
-            char_target=_char_target,
+            char_min=_scale_cfg.char_range[0],
+            char_max=_scale_cfg.char_range[1],
         )
         if gate["can_identify"] and gate["can_generate"]:
             return {
@@ -1084,7 +1085,6 @@ async def copy_world(
     current_user: M9User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
-    world_repo = WorldRepository(session)
     try:
         result = await world_service.copy_world(world_id, user_id=str(current_user.id))
         # Trigger async embedding rebuild for the new world

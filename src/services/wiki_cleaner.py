@@ -43,10 +43,38 @@ def clean_wiki_text(text: str) -> str:
     )
     # 9b. Inline CSS fragments embedded in text (e.g. .mw-parser-output ruby>rt{...})
     text = re.sub(r"\.mw-parser-output[^\n{]*\{[^}]*\}", "", text)
-    # 10. Markdown table rows: lines starting and ending with |
-    #     Matches | content |, | --- | separator rows, and consecutive table blocks
-    #     Catches infobox tables, maintenance templates, and pure separator rows
-    text = re.sub(r"(?:^|\n)(?:\s*\|[^\n]*\|[\n]?)+", "", text)
+    # 10. Markdown table rows: convert consecutive |...| blocks to plain text.
+    #     Previously this step DELETED all table rows, which accidentally removed
+    #     character descriptions stored in wiki tables (e.g. moegirl's | 角色名 | 描述 |).
+    #     Now: skip separator rows (| --- |), convert cell content to space-separated text.
+    def _convert_table_block(lines: list[str]) -> list[str]:
+        result = []
+        buf: list[str] = []
+        sep_re = re.compile(r"^\|[\s\-|]+\|$")
+
+        def flush():
+            for row in buf:
+                stripped = row.strip()
+                if sep_re.match(stripped):
+                    continue
+                if stripped.startswith("|") and stripped.endswith("|"):
+                    cells = [c.strip() for c in stripped.strip("|").split("|")]
+                    cells = [c for c in cells if c]
+                    if cells:
+                        result.append(" ".join(cells))
+            buf.clear()
+
+        for row in lines:
+            stripped = row.strip()
+            if stripped.startswith("|") and stripped.endswith("|"):
+                buf.append(row)
+            else:
+                flush()
+                result.append(row)
+        flush()
+        return result
+
+    text = "\n".join(_convert_table_block(text.split("\n")))
     # 11. Cite note residual markers (#cite_note-...)
     text = re.sub(r"\(#cite_note-[^)]*\)", "", text)
     # 12. Horizontal rules --- *** ___ (allow leading whitespace)

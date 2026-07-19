@@ -14,7 +14,7 @@ import type {
 } from '@/api/importApi'
 import { previewGraphImport, confirmGraphImport } from '@/api/importApi'
 import { parseApiError } from '@/utils/apiError'
-import { extractPromptSection } from '@/utils/importPrompt'
+import { extractPromptSection, extractJsonBlocks } from '@/utils/importPrompt'
 import graphMd from '@docs/import-prompts/graph-characters-relations.md?raw'
 import GraphImportCharRow from './GraphImportCharRow.vue'
 import GraphImportRelRow from './GraphImportRelRow.vue'
@@ -91,44 +91,6 @@ function resetState() {
 watch(() => props.show, (v) => {
   if (v) resetState()
 })
-
-function extractJsonBlocks(text: string) {
-  // Find all JSON-like objects/arrays in the text
-  const blocks: string[] = []
-  let depth = 0
-  let start = -1
-  const inCode = text.includes('```')
-
-  if (inCode) {
-    // Extract from code blocks
-    const codeMatches = text.match(/```(?:json)?\s*([\s\S]*?)```/g)
-    if (codeMatches) {
-      for (const match of codeMatches) {
-        const content = match.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim()
-        if (content) blocks.push(content)
-      }
-    }
-  }
-
-  if (blocks.length === 0) {
-    // Try to find JSON objects/arrays directly
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i]
-      if (ch === '{' || ch === '[') {
-        if (depth === 0) start = i
-        depth++
-      } else if (ch === '}' || ch === ']') {
-        depth--
-        if (depth === 0 && start !== -1) {
-          blocks.push(text.slice(start, i + 1))
-          start = -1
-        }
-      }
-    }
-  }
-
-  return blocks
-}
 
 async function handleParse() {
   if (!jsonInput.value.trim()) {
@@ -275,7 +237,7 @@ async function handleConfirm() {
       })
     }
     for (const rp of previewData.relations) {
-      if (rp.status === 'valid') {
+      if (rp.status === 'valid' || rp.status === 'update') {
         rels.push({
           character_a: rp.character_a,
           character_b: rp.character_b,
@@ -346,7 +308,8 @@ function handleCancel() {
       <NSpace style="margin-bottom: 12px; flex-shrink: 0;" :size="12">
         <NTag type="success">{{ $t('import.new') }}: {{ previewData?.new_characters ?? 0 }}</NTag>
         <NTag type="warning">{{ $t('import.existing') }}: {{ previewData?.existing_characters ?? 0 }}</NTag>
-        <NTag>{{ $t('import.validRelations') }}: {{ previewData?.valid_relations ?? 0 }}</NTag>
+        <NTag type="success">{{ $t('import.newRelations') }}: {{ previewData?.valid_relations ?? 0 }}</NTag>
+        <NTag v-if="(previewData?.updated_relations ?? 0) > 0" type="warning">{{ $t('import.updatedRelations') }}: {{ previewData?.updated_relations ?? 0 }}</NTag>
         <NTag v-if="(previewData?.skipped_relations ?? 0) > 0" type="error">{{ $t('import.skippedRelations') }}: {{ previewData?.skipped_relations ?? 0 }}</NTag>
       </NSpace>
 

@@ -506,6 +506,12 @@ export default {
   'version.confirmDelete': '삭제 확인',
   'version.deleteSuccess': '버전이 삭제되었습니다',
   'version.deleteFailed': '삭제 실패: {msg}',
+  'version.createVersion': '새 버전',
+  'version.createSuccess': '버전이 생성되었습니다',
+  'version.createFailed': '생성 실패: {msg}',
+  'version.updateSnapshot': '업데이트',
+  'version.updateSnapshotSuccess': '버전 스냅샷이 업데이트되었습니다',
+  'version.updateSnapshotFailed': '업데이트 실패: {msg}',
 
   // diff
   'diff.added': '추가됨',
@@ -1124,7 +1130,7 @@ export default {
   'import.existingElement': '기존',
   'import.validRelation': '유효',
   'import.skippedRelation': '건너뜀',
-  'import.graphSuccess': '가져오기 완료: {n} 캐릭터, {m} 관계',
+  'import.graphSuccess': '가져오기 완료: 캐릭터 {characters}개, 신규 {relations}개, 업데이트 {updated_relations}개',
   'import.elementsSuccess': '가져오기 완료: {n} 요소',
   'import.worldSuccess': '세계 필드를 가져왔습니다',
   'import.copyErrorPrompt': '수정 프롬프트 복사',

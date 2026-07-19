@@ -2,7 +2,6 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import (
-    BigInteger,
     Boolean,
     CheckConstraint,
     DateTime,

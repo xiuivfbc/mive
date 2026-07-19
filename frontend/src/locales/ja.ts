@@ -506,6 +506,12 @@ export default {
   'version.confirmDelete': '削除を確認',
   'version.deleteSuccess': 'バージョンが削除されました',
   'version.deleteFailed': '削除失敗: {msg}',
+  'version.createVersion': '新規バージョン',
+  'version.createSuccess': 'バージョンを作成しました',
+  'version.createFailed': '作成失敗: {msg}',
+  'version.updateSnapshot': '更新',
+  'version.updateSnapshotSuccess': 'バージョンスナップショットを更新しました',
+  'version.updateSnapshotFailed': '更新失敗: {msg}',
 
   // diff
   'diff.added': '追加',
@@ -1124,7 +1130,7 @@ export default {
   'import.existingElement': '既存',
   'import.validRelation': '有効',
   'import.skippedRelation': 'スキップ',
-  'import.graphSuccess': 'インポート完了: {n} キャラクター、{m} 関係',
+  'import.graphSuccess': 'インポート完了: キャラクター {characters}、新規 {relations}、更新 {updated_relations}',
   'import.elementsSuccess': 'インポート完了: {n} 要素',
   'import.worldSuccess': '世界フィールドをインポートしました',
   'import.copyErrorPrompt': '修正プロンプトをコピー',

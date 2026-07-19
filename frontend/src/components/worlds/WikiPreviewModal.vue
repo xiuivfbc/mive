@@ -9,6 +9,9 @@ const props = defineProps<{
   visible: boolean
   url: string | null
   pageTitle?: string | null
+  // 作品标题/作者（来自创建表单，用于非维基链接如百度百科复用 _search_wiki 缓存）
+  title?: string | null
+  author?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -37,7 +40,7 @@ async function load(url: string) {
   loading.value = true
   errorMsg.value = null
   try {
-    const result = await getWikiPreview(url)
+    const result = await getWikiPreview(url, props.title, props.author)
     cache.set(url, result)
     content.value = result.content
     truncated.value = result.truncated

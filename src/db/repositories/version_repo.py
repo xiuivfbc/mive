@@ -70,6 +70,16 @@ class VersionRepository:
         await self.session.refresh(row)
         return self._to_model(row)
 
+    async def update_snapshot(self, version_id: str, snapshot: dict) -> WorldVersion | None:
+        """Update an existing version's snapshot data."""
+        row = await self.session.get(M2WorldVersion, uuid.UUID(version_id))
+        if row is None:
+            return None
+        row.snapshot = snapshot
+        await self.session.flush()
+        await self.session.refresh(row)
+        return self._to_model(row)
+
     async def is_latest(self, version_id: str, world_id: str) -> bool:
         """Check if version_id is the latest version for the world."""
         latest = await self.get_latest(world_id)

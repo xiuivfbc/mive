@@ -29,3 +29,16 @@ export async function deleteVersion(
 ): Promise<void> {
   await client.delete(`/worlds/${worldId}/versions/${versionId}`)
 }
+
+export async function createVersion(worldId: string): Promise<WorldVersion> {
+  const { data } = await client.post(`/worlds/${worldId}/versions`)
+  return data
+}
+
+export async function updateVersionSnapshot(
+  worldId: string,
+  versionId: string
+): Promise<WorldVersion> {
+  const { data } = await client.post(`/worlds/${worldId}/versions/${versionId}/update-snapshot`)
+  return data
+}

@@ -106,8 +106,9 @@ _REAL_PERSON_BLACKLIST_RE = re.compile(
 # 向后兼容：全量正则（所有三组）
 _WHITELIST_RE = _build_whitelist_re(True, True, True)
 
-# 匹配 markdown 二级标题: ## 标题
+# 匹配 markdown 标题: ## 标题 或 ### 子标题（萌娘百科等用三级标题存放角色/剧情）
 _HEADING_RE = re.compile(r"^## (.+)$", re.MULTILINE)
+_ALL_HEADINGS_RE = re.compile(r"^(#{1,6}) (.+)$", re.MULTILINE)
 
 
 def filter_wiki_content(
@@ -209,14 +210,21 @@ def _truncate_trailing_footer(raw_wiki: str) -> str:
 
 
 def _split_wiki_headings(raw_wiki: str) -> dict[str, str]:
-    """Pure split by ## headings into preamble / characters / world_setting / plot.
+    """Pure split by ##/### headings into preamble / characters / world_setting / plot.
 
     No text transformation -- preserves all markup including links, images, templates.
+    Recognizes both ## (level-2) and ### (level-3) headings.
+    #### and deeper are ignored (too granular for grouping).
+
+    Unmatched ### headings are treated as sub-sections of the preceding matched
+    heading (e.g. ### 大好真真子 under ## 登場人物). Unmatched ## headings reset
+    the current group boundary.
+
     Priority: characters > world_setting > plot.
-    If no ## headings exist, entire content goes to characters group.
+    If no ## or ### headings exist, entire content goes to characters group.
     """
     raw_wiki = _truncate_trailing_footer(raw_wiki)
-    headings = list(_HEADING_RE.finditer(raw_wiki))
+    headings = list(_ALL_HEADINGS_RE.finditer(raw_wiki))
 
     if not headings:
         return {
@@ -228,35 +236,64 @@ def _split_wiki_headings(raw_wiki: str) -> dict[str, str]:
 
     preamble = raw_wiki[: headings[0].start()]
 
-    characters_parts: list[str] = []
-    world_setting_parts: list[str] = []
-    plot_parts: list[str] = []
+    # First pass: classify each heading (match_obj, group_key_or_None, level)
+    classified: list[tuple[re.Match[str], str | None, int]] = []
+    for m in headings:
+        level = len(m.group(1))
+        heading_text = m.group(2)
+        if level > 3:
+            classified.append((m, None, level))
+            continue
 
-    for i, m in enumerate(headings):
-        heading_text = m.group(1)
-        start = m.start()
-        end = headings[i + 1].start() if i + 1 < len(headings) else len(raw_wiki)
-        section = raw_wiki[start:end]
-
+        key: str | None = None
         if (
             _CHARACTERS_RE is not None
             and _CHARACTERS_RE.search(heading_text)
             and not _REAL_PERSON_BLACKLIST_RE.search(heading_text)
         ):
-            characters_parts.append(section)
+            key = "characters"
         elif (
             _WORLD_SETTING_RE is not None
             and _WORLD_SETTING_RE.search(heading_text)
             and not _SETTING_BLACKLIST_RE.search(heading_text)
         ):
-            world_setting_parts.append(section)
+            key = "world_setting"
         elif (
             _PLOT_RE is not None
             and _PLOT_RE.search(heading_text)
             and not _REAL_PERSON_BLACKLIST_RE.search(heading_text)
         ):
-            plot_parts.append(section)
-        # unmatched sections are not collected
+            key = "plot"
+        classified.append((m, key, level))
+
+    characters_parts: list[str] = []
+    world_setting_parts: list[str] = []
+    plot_parts: list[str] = []
+    current_key: str | None = None
+
+    for idx, (m, key, level) in enumerate(classified):
+        start = m.start()
+        end = headings[idx + 1].start() if idx + 1 < len(headings) else len(raw_wiki)
+        section = raw_wiki[start:end]
+
+        if key is not None:
+            current_key = key
+            if key == "characters":
+                characters_parts.append(section)
+            elif key == "world_setting":
+                world_setting_parts.append(section)
+            elif key == "plot":
+                plot_parts.append(section)
+        else:
+            if level == 2:
+                current_key = None
+            elif level == 3:
+                if current_key == "characters":
+                    characters_parts.append(section)
+                elif current_key == "world_setting":
+                    world_setting_parts.append(section)
+                elif current_key == "plot":
+                    plot_parts.append(section)
 
     return {
         "preamble": preamble,

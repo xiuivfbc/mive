@@ -28,8 +28,8 @@ export interface WikiPreviewResult {
   truncated: boolean
 }
 
-export async function getWikiPreview(url: string): Promise<WikiPreviewResult> {
-  const { data } = await client.post('/worlds/wiki-preview', { url })
+export async function getWikiPreview(url: string, title?: string | null, author?: string | null): Promise<WikiPreviewResult> {
+  const { data } = await client.post('/worlds/wiki-preview', { url, title, author })
   return data
 }
 

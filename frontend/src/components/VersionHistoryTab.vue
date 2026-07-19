@@ -11,10 +11,14 @@ const { t } = useI18n()
 const {
   versions,
   loading,
+  creating,
+  updating,
   loadVersions,
   onRollback,
   renameVersion,
   onDelete: onDeleteRaw,
+  onCreateVersion,
+  onUpdateSnapshot,
 } = useVersionHistory(props.worldId)
 
 function onDelete(versionId: string) {
@@ -103,10 +107,17 @@ function formatRelation(
 onMounted(() => {
   loadVersions()
 })
+
+defineExpose({ onCreateVersion, creating })
 </script>
 
 <template>
   <div class="version-history">
+    <div class="version-history__actions">
+      <NButton size="small" type="primary" :loading="creating" @click="onCreateVersion">
+        {{ $t('version.createVersion') }}
+      </NButton>
+    </div>
     <!-- 版本列表 -->
     <NSpin :show="loading">
       <NEmpty v-if="!loading && visibleVersions.length === 0" :description="$t('version.noVersions')" />
@@ -221,6 +232,13 @@ onMounted(() => {
                 v-if="ver.snapshot"
                 size="tiny"
                 quaternary
+                :loading="updating"
+                @click="onUpdateSnapshot(ver.id)"
+              >{{ $t('version.updateSnapshot') }}</NButton>
+              <NButton
+                v-if="ver.snapshot"
+                size="tiny"
+                quaternary
                 @click="toggleExpanded(ver.id)"
               >{{ isExpanded(ver.id) ? $t('version.collapse') : $t('version.expand') }}</NButton>
               <NButton
@@ -259,6 +277,13 @@ onMounted(() => {
   height: 100%;
   overflow-y: auto;
   padding: 8px 0;
+}
+
+.version-history__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  padding: 0 4px;
 }
 
 .version-history__list {

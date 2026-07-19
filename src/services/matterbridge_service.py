@@ -24,8 +24,9 @@ import os
 import time
 import uuid
 from base64 import b64decode, b64encode
-from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, Callable, Coroutine
+from collections.abc import Callable, Coroutine
+from datetime import datetime
+from typing import TYPE_CHECKING, Any
 
 import httpx
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -33,7 +34,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from src.db.repositories.matterbridge_repo import MatterbridgeBridgeRepository
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+    pass
 
 logger = logging.getLogger(__name__)
 

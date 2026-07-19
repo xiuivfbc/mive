@@ -50,24 +50,17 @@ class VersionService:
         self.redis = redis
         self._character_service = character_service
 
-    async def create_snapshot(
+    async def _build_snapshot_data(
         self,
         world_id: str,
-        created_by: str | None = None,
-        summary: str | None = None,
         include_memories: bool = True,
         include_dialogues: bool = True,
-    ) -> WorldVersion:
-        """创建 v2 格式快照。characters/relations/elements 不存 UUID，只存业务数据。
-
-        Args:
-            include_memories: False 时跳过记忆查询（轻量快照），角色 memories 为空。
-            include_dialogues: False 时跳过对话元数据查询（轻量快照），dialogues 为空。
-        """
+    ) -> dict:
+        """构建快照数据字典（从当前世界状态读取），供 create_snapshot / update_snapshot 复用。"""
         from src.db.models import M1World
 
         if self.session is None:
-            raise RuntimeError("Session required for create_snapshot")
+            raise RuntimeError("Session required for building snapshot data")
 
         # 1. 查询世界行（获取 user_character_id 和 elements）
         world_row = await self.session.scalar(
@@ -128,7 +121,6 @@ class VersionService:
             name_a = id_to_name.get(rel.character_a)
             name_b = id_to_name.get(rel.character_b)
             if name_a is None or name_b is None:
-                # 指向已删除角色的孤儿关系，跳过
                 continue
             rel_snapshot_list.append(
                 {
@@ -147,7 +139,7 @@ class VersionService:
 
         snapshot_type = "full" if include_memories else "light"
 
-        snapshot = {
+        return {
             "format_version": "v2",
             "snapshot_type": snapshot_type,
             "characters": char_snapshot_list,
@@ -155,6 +147,24 @@ class VersionService:
             "elements": elements_data,
             "dialogues": dialogues,
         }
+
+    async def create_snapshot(
+        self,
+        world_id: str,
+        created_by: str | None = None,
+        summary: str | None = None,
+        include_memories: bool = True,
+        include_dialogues: bool = True,
+    ) -> WorldVersion:
+        """创建 v2 格式快照。characters/relations/elements 不存 UUID，只存业务数据。
+
+        Args:
+            include_memories: False 时跳过记忆查询（轻量快照），角色 memories 为空。
+            include_dialogues: False 时跳过对话元数据查询（轻量快照），dialogues 为空。
+        """
+        from src.db.models import M1World
+
+        snapshot = await self._build_snapshot_data(world_id, include_memories, include_dialogues)
 
         latest = await self.version_repo.get_latest(world_id)
         parent_id = latest.id if latest else None
@@ -168,6 +178,52 @@ class VersionService:
         )
 
         # Bug 4: 写入 synced_generation，使快照记录与当前 generation 对齐
+        world_uuid = uuid.UUID(world_id)
+        current_gen = await self.session.scalar(
+            select(M1World.snapshot_generation).where(M1World.id == world_uuid)
+        )
+        if current_gen is not None:
+            await self.version_repo.update_synced_generation(new_version.id, current_gen)
+
+        return new_version
+
+    async def update_snapshot(self, version_id: str, world_id: str) -> WorldVersion:
+        """将指定版本或最新版本的快照数据更新为当前世界状态。"""
+        version = await self.version_repo.get_by_id(version_id)
+        if version is None:
+            raise ValueError("Version not found")
+
+        snapshot = await self._build_snapshot_data(
+            world_id, include_memories=True, include_dialogues=True
+        )
+        updated = await self.version_repo.update_snapshot(version_id, snapshot)
+        if updated is None:
+            raise ValueError("Version not found")
+        return updated
+
+    async def create_version(self, world_id: str) -> WorldVersion:
+        """创建新版本：先自动更新当前版本快照，再创建新版本。"""
+        snapshot = await self._build_snapshot_data(
+            world_id, include_memories=True, include_dialogues=True
+        )
+
+        # 1. 更新当前最新版本的快照（保存当前状态到现有版本）
+        latest = await self.version_repo.get_latest(world_id)
+        if latest:
+            await self.version_repo.update_snapshot(latest.id, snapshot)
+
+        # 2. 创建新版本
+        new_version = await self.version_repo.create(
+            world_id=world_id,
+            snapshot=snapshot,
+            created_by="user",
+            summary=None,
+            parent_version_id=latest.id if latest else None,
+        )
+
+        # 3. 写入 synced_generation
+        from src.db.models import M1World
+
         world_uuid = uuid.UUID(world_id)
         current_gen = await self.session.scalar(
             select(M1World.snapshot_generation).where(M1World.id == world_uuid)

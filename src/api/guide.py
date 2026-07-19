@@ -1,7 +1,7 @@
 """Guide content API — public read."""
 
-from fastapi.responses import Response
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

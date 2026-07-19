@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+import os
 import random
+import time
 import uuid
 from typing import TYPE_CHECKING
 
@@ -19,6 +21,43 @@ if TYPE_CHECKING:
     from src.services.element_retrieval_service import ElementRetrievalService
 
 logger = logging.getLogger(__name__)
+
+# ── Debug dump ────────────────────────────────────────────────────────────────
+
+_DEBUG_DIR = "/tmp/chat_debug"
+
+
+async def _dump_llm_input(
+    stage: str,
+    cacheable_prefix: str,
+    system_prompt: str,
+    user_prompt: str,
+    session_id: str | None = None,
+):
+    """Dump the full LLM input to a file for debugging."""
+    os.makedirs(_DEBUG_DIR, exist_ok=True)
+    ts = time.time()
+    safe_session = (session_id or "none").replace("/", "_")[:16]
+    fname = f"{_DEBUG_DIR}/{stage}_{safe_session}_{int(ts)}.txt"
+    with open(fname, "w", encoding="utf-8") as f:
+        f.write("=" * 60 + "\n")
+        f.write(f"STAGE: {stage}\n")
+        f.write(f"TIMESTAMP: {ts}\n")
+        f.write(f"SESSION: {session_id}\n")
+        f.write("=" * 60 + "\n\n")
+        f.write("──【CACHEABLE PREFIX】──\n")
+        f.write(cacheable_prefix)
+        f.write("\n\n")
+        f.write("──【SYSTEM PROMPT】──\n")
+        f.write(system_prompt)
+        f.write("\n\n")
+        f.write("──【USER PROMPT】──\n")
+        f.write(user_prompt)
+        f.write("\n\n")
+        f.write("─" * 40 + "\n")
+        f.write(f"File: {fname}\n")
+    logger.info("[debug_dump] wrote %s -> %s", stage, fname)
+
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 # select_participants 阶段候选元素可见数量
@@ -95,16 +134,16 @@ def _build_cacheable_prefix(world_doc, role_label: str) -> str:
         parts.append(work_info)
     common_sense = getattr(getattr(world_doc, "source", None), "common_sense", None)
     if common_sense:
-        parts.append(f"## 世界设定\n{common_sense}")
+        parts.append(f"<world_setting>{common_sense}</world_setting>")
     plot_development = getattr(getattr(world_doc, "source", None), "plot_development", None)
     if plot_development:
-        parts.append(f"## 剧情发展\n{plot_development}")
+        parts.append(f"<plot_development>{plot_development}</plot_development>")
     core_conflict = getattr(getattr(world_doc, "source", None), "core_conflict", None)
     if core_conflict:
-        parts.append(f"## 核心冲突\n{core_conflict}")
+        parts.append(f"<core_conflict>{core_conflict}</core_conflict>")
     tone_and_atmosphere = getattr(getattr(world_doc, "source", None), "tone_and_atmosphere", None)
     if tone_and_atmosphere:
-        parts.append(f"## 氛围基调\n{tone_and_atmosphere}")
+        parts.append(f"<tone_and_atmosphere>{tone_and_atmosphere}</tone_and_atmosphere>")
     return "\n".join(parts)
 
 
@@ -327,6 +366,7 @@ class DialogueGenerationService:
         show_narration: bool = False,
         event_map: dict[str, str] | None = None,
         user_role: str | None = None,
+        manual_elements: list[str] | None = None,
     ) -> dict:
         """Call 1: 选角 + 旁白 + 选元素 + 选事件。
 
@@ -425,7 +465,16 @@ class DialogueGenerationService:
         max_element_count = 12
         max_element_ctx_len = 1200
         non_char_elements_ctx = ""
-        if world_doc and getattr(world_doc, "elements", None):
+        if manual_elements and world_doc:
+            elem_id_map = {e.id: e for e in (world_doc.elements or [])}
+            elem_lines = []
+            for eid in manual_elements:
+                elem = elem_id_map.get(eid)
+                if elem:
+                    elem_lines.append(f"- {elem.name}：{elem.brief or elem.detail or ''}")
+            if elem_lines:
+                non_char_elements_ctx = "\n".join(elem_lines)
+        elif world_doc and getattr(world_doc, "elements", None):
             non_char_elems = [
                 e
                 for e in world_doc.elements
@@ -447,10 +496,41 @@ class DialogueGenerationService:
         cacheable_prefix = _build_cacheable_prefix(world_doc, "对话引擎")
 
         # ── 规则与输出格式 ─────────────────────────────────────────────────
-        rule_num = 2  # 规则 1 = 选角，已在下面硬编码
+        # 用户扮演角色的排除说明（要提前计算，供 include 模式使用）
+        _uc_name = None
+        if world_user_char_id:
+            _user_char = next((c for c in all_characters if str(c.id) == world_user_char_id), None)
+            _uc_name = _user_char.name if _user_char else "用户"
+
+        # ── include 模式：用户已指定了必须包含的角色 ───────────────────
+        include_rule = ""
+        if participant_mode == "include" and current_participants:
+            selected_names = [p["name"] for p in current_participants]
+            _exclude_name = _uc_name if world_user_char_id else None
+            forced_names = [n for n in selected_names if n != _exclude_name]
+            if forced_names:
+                include_rule = (
+                    "1. 用户已指定了发言角色："
+                    f"{'、'.join(forced_names)}。"
+                    "这些角色必须出现在 speakers 中（可额外增加其他角色）。"
+                    "可选填背景角色（仅在场不发言，通常留空）"
+                )
+            else:
+                include_rule = (
+                    "1. 从候选角色列表中选出发言角色（通常 2-4 人），"
+                    "可选填背景角色（仅在场不发言，通常留空）"
+                )
+        else:
+            include_rule = (
+                "1. 从候选角色列表中选出发言角色（通常 2-4 人），"
+                "可选填背景角色（仅在场不发言，通常留空）"
+            )
+
+        rule_num = 1  # 规则 1 = 选角，已在上方处理
         element_rule = ""
         element_output = ""
-        if non_char_elements_ctx:
+        has_element_selection = non_char_elements_ctx and not manual_elements
+        if has_element_selection:
             rule_num += 1
             element_rule = (
                 f"{rule_num}. 从世界元素中选出与当前对话最相关的"
@@ -474,19 +554,20 @@ class DialogueGenerationService:
         output_rule = f"{rule_num}. 输出 JSON 格式\n\n"
 
         output_format = (
-            '```json\n{"speakers": ["角色名A", "角色名B"], "background": ["角色名C"], '
-            '"narration": "..."' + element_output + event_output + "}\n```"
+            '```json\n{"speakers": ["角色名A", "角色名B"], "background": ["角色名C"]'
+            + element_output
+            + event_output
+            + "}\n```"
         )
 
-        # 用户扮演角色的排除说明
+        # 用户扮演角色的排除说明（追加到规则 1 末尾）
         user_char_exclude_rule = ""
-        if world_user_char_id:
-            _user_char = next((c for c in all_characters if str(c.id) == world_user_char_id), None)
-            _uc_name = _user_char.name if _user_char else "用户"
+        if world_user_char_id and _uc_name:
             user_char_exclude_rule = (
                 f"。用户正在扮演角色【{_uc_name}】，"
                 "该角色绝对不允许出现在 speakers 或 background 中\n"
             )
+        rule_1 = include_rule + (user_char_exclude_rule or "\n")
 
         system_prompt = (
             f"\n\n## 候选角色列表\n{input_chars_brief}\n\n"
@@ -497,14 +578,7 @@ class DialogueGenerationService:
             )
             + (f"## 事件列表（ID+摘要）\n{events_ctx}\n\n" if events_ctx else "")
             + "## 规则\n\n"
-            "1. 从候选角色列表中选出发言角色（通常 2-4 人），"
-            "可选填背景角色（仅在场不发言，通常留空）"
-            + (user_char_exclude_rule or "\n")
-            + (
-                "2. 生成一段场景旁白（可含地点/氛围），允许为空字符串\n"
-                if show_narration
-                else "2. narration 字段必须为空字符串\n"
-            )
+            + rule_1
             + element_rule
             + event_rule
             + output_rule
@@ -512,13 +586,27 @@ class DialogueGenerationService:
             + get_lang_hint()
         )
 
+        # 用户身份标识
+        effective_role = user_role or world_user_char_id
+        if effective_role:
+            _user_char = next((c for c in all_characters if str(c.id) == effective_role), None)
+            _role_name = _user_char.name if _user_char else "用户"
+            user_prefix = f"用户扮演【{_role_name}】说"
+        else:
+            user_prefix = "用户（时空旅行者）说"
+
         user_prompt = (
             f"## 最近对话历史\n{history_desc}\n\n"
-            f"用户刚刚说：{user_message}\n\n"
-            "请选出参与角色、生成旁白"
-            + ("、选出相关元素" if non_char_elements_ctx else "")
+            f"{user_prefix}：{user_message}\n\n"
+            "请选出参与角色"
+            + ("、选出相关元素" if has_element_selection else "")
             + ("和相关事件" if events_ctx else "")
             + "。"
+        )
+
+        # ── debug dump ─────────────────────────────────────────────────────
+        await _dump_llm_input(
+            "select_participants", cacheable_prefix, system_prompt, user_prompt, session_id
         )
 
         # 选角切到副模型（线 A 单点验证）；回退链由 FallbackLLMProvider 内部兜底
@@ -680,6 +768,9 @@ class DialogueGenerationService:
             f"用户刚刚说：{user_message}\n\n"
             "请选出相关事件和元素。"
         )
+
+        # ── debug dump ─────────────────────────────────────────────────────
+        await _dump_llm_input("supplement_context", "", system_prompt, user_prompt, session_id)
 
         result = await self.select_llm.complete_json(
             system_prompt,
@@ -982,6 +1073,9 @@ class DialogueGenerationService:
         history = [
             m for m in history if m.type != "event" and getattr(m, "status", "normal") != "failed"
         ][-20:]
+        # Fix: 排除最后一条用户消息——它已通过「用户刚刚说」传入 user_prompt，避免重复
+        if history and history[-1].type == "user":
+            history = history[:-1]
         _char_id_to_name = {c.id: c.name for c in characters}
 
         def _sender_label(msg):
@@ -1093,7 +1187,7 @@ class DialogueGenerationService:
                     exc_info=True,
                 )
 
-        # 兜底：无检索服务（或检索为空）且仍未注入任何元素时，按硬截断全量注入世界元素。
+        # 兜底：无检索服务（或检索为空）且仍未注入任何元素时，按优先级全量注入世界元素。
         # select_participants 已不再选元素，若无此兜底，未配 embedding 的部署聊天会完全
         # 丢失世界元素上下文——此处沿用 CLAUDE.md「检索不可用降级为全量加载」的既定哲学。
         if not elements_detail_ctx and world_doc and world_doc.elements:
@@ -1105,7 +1199,18 @@ class DialogueGenerationService:
                 for e in world_doc.elements
                 if not (e.category and ("人物" in e.category or "角色" in e.category))
             ]
-            for elem in non_char_elems[:SELECT_PARTICIPANTS_ELEMENT_CAP]:
+
+            # 场所 > 势力 > 其他（同类别内保持原序）
+            def _category_rank(e):
+                cat = e.category or ""
+                if "场所" in cat:
+                    return 0
+                if "势力" in cat:
+                    return 1
+                return 2
+
+            non_char_elems.sort(key=_category_rank)
+            for elem in non_char_elems[:ELEMENT_CAP_FALLBACK]:
                 detail_text = elem.detail or elem.brief
                 prefix = f'<element category="{elem.category}" name="{elem.name}">'
                 suffix = "</element>"
@@ -1134,11 +1239,17 @@ class DialogueGenerationService:
             target_rule = "1. 根据对话上下文决定哪些角色会回应，不要让所有角色都说话\n"
         other_rules_start = 2
 
-        user_identity_rule = (
-            f"{other_rules_start}. 对话中存在一位用户参与者："
-            f"若其身份为时空旅行者，{_EXPLORER_PERSONA}"
-            "不要让角色过度提及时空等元概念，自然交谈即可\n"
-        )
+        if user_role or world_user_char_id:
+            user_identity_rule = (
+                f"{other_rules_start}. 对话中存在一位用户参与者，"
+                "该用户正在扮演某个角色，不允许生成该角色台词\n"
+            )
+        else:
+            user_identity_rule = (
+                f"{other_rules_start}. 对话中存在一位用户参与者："
+                f"若其身份为时空旅行者，{_EXPLORER_PERSONA}"
+                "不要让角色过度提及时空等元概念，自然交谈即可\n"
+            )
 
         # 全量角色名+brief
         chars_brief = "\n".join(f"- {c.name}: {c.profile.get('brief', '')}" for c in characters)
@@ -1182,9 +1293,15 @@ class DialogueGenerationService:
             + f"{other_rules_start + 3}. 时间由系统自动分配，你不需要输出时间字段\n"
             + f"{other_rules_start + 4}. 输出 JSON 格式\n"
             + f"{other_rules_start + 5}. **关键**：所有字符串值必须用英文双引号包裹，"
-            "包括 content 字段。例如正确格式："
-            '`"content": "*她笑了* 你好呀"`，'
-            '错误格式：`"content": *她笑了* 你好呀`\n\n'
+            "包括 content 字段。"
+            + (
+                "例如正确格式："
+                '`"content": "*她笑了* 你好呀"`，'
+                '错误格式：`"content": *她笑了* 你好呀`'
+                if action_descriptions
+                else '例如正确格式：`"content": "你好呀"`，错误格式：`"content": 你好呀`'
+            )
+            + "\n\n"
             "## 输出格式（正常回复）\n\n"
             "```json\n"
             "{\n"
@@ -1215,9 +1332,14 @@ class DialogueGenerationService:
 
         user_prompt = (
             user_identity_ctx + f"## 最近对话历史\n{history_desc}\n\n"
-            f"用户刚刚说：\n{user_message}\n\n"
-            "请生成回复。"
+            f"用户刚刚说：\n{user_message}"
             + (f"\n\n【约束】{constraint}" if constraint else "")
+            + "\n\n请生成回复。"
+        )
+
+        # ── debug dump ─────────────────────────────────────────────────────
+        await _dump_llm_input(
+            "generate_response", cacheable_prefix, system_prompt, user_prompt, session_id
         )
 
         result = await self.llm.complete_json(

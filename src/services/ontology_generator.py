@@ -52,6 +52,9 @@ class OntologyGenerator:
             max_tokens=2048,
         )
 
+        if not isinstance(result, dict):
+            result = {}
+
         return self._validate(result)
 
     def _validate(self, result: dict) -> dict:
